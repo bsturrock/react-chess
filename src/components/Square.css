@@ -1,0 +1,217 @@
+
+.square {
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+.square.dark {
+    background-color: #6c3d19;
+}
+
+.square.light {
+    background-color: #f4e5cb;
+}
+
+.square.selected {
+    background-color: navy;
+}
+
+.square.dark.hoverable:hover {
+    cursor: pointer;
+    background-color: rgb(119, 44, 12);
+}
+
+.square.light.hoverable:hover {
+    cursor: pointer;
+    background-color: rgb(255, 246, 227);
+}
+
+.square.selected:hover {
+    cursor: pointer;
+    background-color: rgb(32, 32, 154) !important;
+}
+
+.square.white.pawn::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_pawn.png');
+}
+
+.square.white.knight::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_knight.png');
+}
+
+.square.white.bishop::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_bishop.png');
+}
+
+.square.white.rook::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_rook.png');
+}
+
+.square.white.queen::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_queen.png');
+}
+
+.square.white.king::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/white_king.png');
+}
+
+.square.black.pawn::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_pawn.png');
+}
+
+.square.black.knight::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_knight.png');
+}
+
+.square.black.bishop::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_bishop.png');
+}
+
+.square.black.rook::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_rook.png');
+}
+
+.square.black.queen::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_queen.png');
+}
+
+.square.black.king::after{
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-52%, -50%);
+    width: 100px;
+    height: 100px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('static/images/black_king.png');
+}
+
+.square.move::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: rgb(31, 31, 174);
+}
+
+.square.move:hover {
+    cursor: pointer;
+}
+
+.square.move:hover::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: rgb(67, 67, 205);
+}
