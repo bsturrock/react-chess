@@ -1,6 +1,6 @@
 import './Square.css'
 
-const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves}) => {
+const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, gameData}) => {
 
     const {piece} = data
     const hasColor = piece==null ? false : piece.color=='white' ? true : false
@@ -14,6 +14,9 @@ const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves}) 
     }
 
     const handleClick = () => {
+        if(gameData.turn=='black'){
+            return
+        }
         if(selectedSquare!=null){
             movePiece(data)
         } else {

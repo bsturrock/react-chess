@@ -1,12 +1,24 @@
 import { useEffect, useState } from "react"
 import Square from "../components/Square"
 import './Board.css'
+import Fen from "../scripts/fen"
 const Board = () => {
 
     const [boardData, setBoardData] = useState([])
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [possibleMoves, setPossibleMoves] = useState([])
+    const [gameData, setGameData] = useState({
+        turn: 'white',
+        moves: 0,
+        halfMoveClock: 0
+    })
+    const fen = new Fen()
 
+    //maybe we don't even useEffect his, just call calculate when we make the call to stockfish
+    useEffect(()=>{
+        fen.calculatePosition(boardData, gameData)
+        console.log(fen.position)
+    },[boardData])
 
 
     const selectSquare = (target) => {
@@ -19,6 +31,7 @@ const Board = () => {
         }
         
     }
+    
     const squareIsEmpty = (square) => {
         return square.piece == null
     }
@@ -165,7 +178,6 @@ const Board = () => {
         return moves
     }
     
-
     const generatePossibleMoves = (target) => {
         console.log(target)
         let moves = []
@@ -205,6 +217,12 @@ const Board = () => {
             })
             setBoardData(newBoard)
             selectSquare(null)
+            setGameData({
+                moves: gameData.moves+1,
+                turn: 'black',
+                //need changes here
+                halfMoveClock: gameData.halfMoveClock+1
+            })
         }
         
 
@@ -257,7 +275,19 @@ const Board = () => {
         buildBoard()
     },[])
 
-    const renderedBoard = boardData.map((ele, index)=><Square key={index} data={ele} selectedSquare={selectedSquare} selectSquare={selectSquare} movePiece={movePiece} possibleMoves={possibleMoves} generatePossibleMoves={generatePossibleMoves}/>)
+    const renderedBoard = boardData.map((ele, index)=>{        
+        return (
+            <Square 
+                gameData={gameData}
+                key={index} 
+                data={ele}
+                selectedSquare={selectedSquare}
+                selectSquare={selectSquare}
+                movePiece={movePiece}
+                possibleMoves={possibleMoves}
+                generatePossibleMoves={generatePossibleMoves}
+            />)
+        })
 
     return <>
         <div className="board">
