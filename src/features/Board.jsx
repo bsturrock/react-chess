@@ -7,9 +7,7 @@ const Board = () => {
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [possibleMoves, setPossibleMoves] = useState([])
 
-    const fetchSquare = (row, column) => {
-        return boardData.filter((ele)=>ele.row==row && ele.column==column)[0]
-    }
+
 
     const selectSquare = (target) => {
         if(target == selectedSquare){
@@ -21,23 +19,172 @@ const Board = () => {
         }
         
     }
+    const squareIsEmpty = (square) => {
+        return square.piece == null
+    }
+
+    const fetchSquare = (row, column) => {
+        return boardData.filter((ele)=>ele.row==row && ele.column==column)[0]
+    }
+
+    const addMove = (row, column, moves) => {
+        let square = fetchSquare(row, column)
+        if(squareIsEmpty(square)){
+            return [...moves, square]
+        } else {
+            return moves
+        }
+    }
     
+    const generatePawnMoves = (target, moves) => {
+        moves = addMove(target.row+1, target.column, moves)
+        if(target.row == 2){
+            moves = addMove(target.row+2, target.column, moves)
+        }
+        return moves
+    }
+    
+    const generateKnightMoves = (target, moves) => {
+        if(target.row+2 <= 8 && target.column + 1 <= 8){
+            moves = addMove(target.row+2, target.column+1, moves)
+        }
+        if(target.row+2 <= 8 && target.column - 1 > 0){
+            moves = addMove(target.row+2, target.column-1, moves)
+        }
+        if(target.row-2 >0 && target.column + 1 <= 8){
+            moves = addMove(target.row-2, target.column+1, moves)
+        }
+        if(target.row-2 >0 && target.column - 1 > 0){
+            moves = addMove(target.row-2, target.column-1, moves)
+        }
+        if(target.row+1 <= 8 && target.column + 2 <= 8){
+            moves = addMove(target.row+1, target.column+2, moves)
+        }
+        if(target.row+1 <= 8 && target.column - 2 > 0){
+            moves = addMove(target.row+1, target.column-2, moves)
+        }
+        if(target.row-1 > 0 && target.column + 2 <= 8){
+            moves = addMove(target.row-1, target.column+2, moves)
+        }
+        if(target.row-1 > 0 && target.column - 2 > 0){
+            moves = addMove(target.row-1, target.column-2, moves)
+        }
+        return moves
+    }
+    
+    const generateRookMoves = (target, moves) => {
+        let i = 1
+        while(target.row+i <=8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column,moves)
+            i++
+        }        
+    
+        i =-1
+        while(target.row+i > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column,moves)
+            i--
+        }  
+        
+        i =1
+        while(target.column+i <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
+                break;
+            }
+            moves = addMove(target.row, target.column+i,moves)
+            i++
+        }   
+    
+        i =-1
+        while(target.column+i > 0){
+            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
+                break;
+            }
+            moves = addMove(target.row, target.column+i,moves)
+            i--
+        }   
+    
+        return moves
+    }
+    
+    const generateBishopMoves = (target, moves) => {
+        let i = 1;
+        let j = 1;
+        while(target.row+i <=8 && target.column + j <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column+j,moves)
+            i++
+            j++
+        }
+    
+        i = -1;
+        j = 1;
+        while(target.row+i > 0 && target.column + j <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column+j,moves)
+            i--
+            j++
+        }
+    
+        i = 1;
+        j = -1;
+        while(target.row+i <=8 && target.column + j > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column+j,moves)
+            i++
+            j--
+        }
+    
+        i = -1;
+        j = -1;
+        while(target.row+i > 0 && target.column + j > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                break;
+            }
+            moves = addMove(target.row+i, target.column+j,moves)
+            i--
+            j--
+        }
+        return moves
+    }
+    
+    const generateQueenMoves = (target, moves) => {
+        moves = generateBishopMoves(target, moves)
+        moves = generateRookMoves(target, moves)
+        return moves
+    }
+    
+
     const generatePossibleMoves = (target) => {
         console.log(target)
-        const moves = []
+        let moves = []
         if(target==null){
             setPossibleMoves([])
             return
         }
         if(target.piece.type == 'pawn'){
-            if(target.row == 2){
-
-                console.log('target is pawn')
-                moves.push(fetchSquare(target.row+1, target.column))
-                moves.push(fetchSquare(target.row+2, target.column))
-            }
+            moves = generatePawnMoves(target, moves)
+        } else if(target.piece.type == 'knight'){
+            moves = generateKnightMoves(target, moves)
+        } else if(target.piece.type == 'bishop'){
+            moves = generateBishopMoves(target, moves)
+        } else if(target.piece.type == 'rook'){
+            moves = generateRookMoves(target, moves)
+        } else if(target.piece.type == 'queen'){
+            moves = generateQueenMoves(target, moves)
         }
-        console.log(moves)
+        
         setPossibleMoves(moves)
     }
 
@@ -107,7 +254,7 @@ const Board = () => {
     }
 
     useEffect(()=>{
-            buildBoard()
+        buildBoard()
     },[])
 
     const renderedBoard = boardData.map((ele, index)=><Square key={index} data={ele} selectedSquare={selectedSquare} selectSquare={selectSquare} movePiece={movePiece} possibleMoves={possibleMoves} generatePossibleMoves={generatePossibleMoves}/>)
