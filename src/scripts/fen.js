@@ -66,9 +66,9 @@ class Fen{
         mystr = mystr.slice(0,mystr.length-1)
 
         if(gameData.turn == 'white'){
-            mystr += ' w'
-        } else {
             mystr += ' b'
+        } else {
+            mystr += ' w'
         }
 
         //castling

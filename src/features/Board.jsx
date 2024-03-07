@@ -14,11 +14,89 @@ const Board = () => {
     })
     const fen = new Fen()
 
-    //maybe we don't even useEffect his, just call calculate when we make the call to stockfish
-    useEffect(()=>{
+
+    const fetchComputerMove = async () => {
         fen.calculatePosition(boardData, gameData)
+
         console.log(fen.position)
-    },[boardData])
+
+        let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=2&mode=bestmove')
+        let res_json = await res.json()
+        console.log(res_json)
+        return res_json
+    }
+
+    const makeComputerMove = (move) => {
+
+        // let newHalfMoveClock = gameData.halfMoveClock
+        // if(selectedSquare.piece.type != 'pawn'){
+        //     newHalfMoveClock++
+        // }
+
+        let start_square = fetchSquare(move.start.row, move.start.column)
+        let end_square = fetchSquare(move.end.row, move.end.column)
+        let tempBoard = boardData.filter((ele)=> ele!= start_square && ele!=end_square)
+        end_square.piece = start_square.piece
+        start_square.piece = null
+        let newBoard = [...tempBoard, start_square, end_square]
+        newBoard.sort((a,b)=>{
+            return b.row - a.row || a.column - b.column
+        })
+        setBoardData(newBoard)
+        setGameData({
+            moves: gameData.moves+1,
+            turn: 'white',
+            //need changes here
+            halfMoveClock: gameData.halfMoveClock+1
+        })        
+
+
+
+    }
+
+    const computerTurn = () => {
+        setTimeout( async ()=>{
+            let move = await fetchComputerMove()
+            move = parseNotationOfMove(move)
+            makeComputerMove(move)
+
+        },1000)
+    }
+
+    const parseNotationOfMove = (move) => {
+        
+        const columnMap = {
+            'a' : 1,
+            'b' : 2,
+            'c' : 3,
+            'd' : 4,
+            'e' : 5,
+            'f' : 6,
+            'g' : 7,
+            'h' : 8
+        }
+        move = move.data
+
+        move = move.split(' ')[1]
+        let start = move.substring(0,2)
+        let end = move.substring(2)
+        return({
+            start: {
+                column: columnMap[start.substring(0,1)],
+                row: start.substring(1,2)
+            },
+            end: {
+                column: columnMap[end.substring(0,1)],
+                row: end.substring(1,2)
+            }
+        })
+    }
+
+    //maybe we don't even useEffect his, just call calculate when we make the call to stockfish
+    // useEffect(()=>{
+    //     fen.calculatePosition(boardData, gameData)
+    //     console.log(fen.position)
+    // },[boardData])
 
 
     const selectSquare = (target) => {
@@ -31,7 +109,7 @@ const Board = () => {
         }
         
     }
-    
+
     const squareIsEmpty = (square) => {
         return square.piece == null
     }
@@ -208,6 +286,12 @@ const Board = () => {
         }
 
         if(possibleMoves.includes(target)){
+
+            let newHalfMoveClock = gameData.halfMoveClock
+            if(selectedSquare.piece.type != 'pawn'){
+                newHalfMoveClock++
+            }
+
             let tempBoard = boardData.filter((ele)=> ele!= selectedSquare && ele!=target)
             target.piece = selectedSquare.piece
             selectedSquare.piece = null
@@ -221,8 +305,9 @@ const Board = () => {
                 moves: gameData.moves+1,
                 turn: 'black',
                 //need changes here
-                halfMoveClock: gameData.halfMoveClock+1
+                halfMoveClock: newHalfMoveClock
             })
+            computerTurn()
         }
         
 
