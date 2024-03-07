@@ -1,6 +1,6 @@
 import './Square.css'
 
-const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, gameData}) => {
+const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, gameData, possibleCaptures, capturePiece}) => {
 
     const {piece} = data
     const hasColor = piece==null ? false : piece.color=='white' ? true : false
@@ -13,18 +13,38 @@ const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, g
         return possibleMoves.includes(data)
     }
 
+    const isPossibleCapture = () => {
+        return possibleCaptures.includes(data)
+    }
+
     const handleClick = () => {
+
         if(gameData.turn=='black'){
             return
         }
-        if(selectedSquare!=null){
+
+        if(!isPossibleMove() && !isPossibleCapture() && !hasColor){
+            return
+        }
+
+        if(isPossibleMove()){
             movePiece(data)
+        } else if (isPossibleCapture()){
+            capturePiece(data)
         } else {
             if(!hasColor){
                 selectSquare(null)
             } else {
                 selectSquare(data)
             }
+        }
+    }
+
+    const possibleCaptureClass = () => {
+        if(isPossibleCapture()){
+            return ' capture'
+        } else {
+            return ''
         }
     }
 
@@ -63,7 +83,7 @@ const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, g
     }
 
     return (
-    <div onClick={handleClick} className={`square${hoverableClass()}${(data.row+data.column)%2==0?' dark':' light'}${pieceTypeClass()}${pieceColorClass()}${isSelected()?' selected':''}${possibleMoveClass()}`}>{data.row}-{data.column}</div>
+    <div onClick={handleClick} className={`square${hoverableClass()}${(data.row+data.column)%2==0?' dark':' light'}${pieceTypeClass()}${pieceColorClass()}${isSelected()?' selected':''}${possibleMoveClass()}${possibleCaptureClass()}`}>{data.row}-{data.column}</div>
     )
 }
 

@@ -200,6 +200,36 @@
     background-color: rgb(31, 31, 174);
 }
 
+.square.capture::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: rgb(174, 31, 52);
+    z-index: 999;
+}
+
+.square.capture:hover {
+    cursor: pointer;
+}
+
+.square.capture:hover::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: rgb(192, 49, 71);
+    z-index: 999;
+}
+
 .square.move:hover {
     cursor: pointer;
 }

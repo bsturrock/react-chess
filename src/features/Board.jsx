@@ -7,6 +7,7 @@ const Board = () => {
     const [boardData, setBoardData] = useState([])
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [possibleMoves, setPossibleMoves] = useState([])
+    const [possibleCaptures, setPossibleCaptures] = useState([])
     const [gameData, setGameData] = useState({
         turn: 'white',
         moves: 0,
@@ -92,20 +93,15 @@ const Board = () => {
         })
     }
 
-    //maybe we don't even useEffect his, just call calculate when we make the call to stockfish
-    // useEffect(()=>{
-    //     fen.calculatePosition(boardData, gameData)
-    //     console.log(fen.position)
-    // },[boardData])
-
-
     const selectSquare = (target) => {
         if(target == selectedSquare){
             setSelectedSquare(null)
             generatePossibleMoves(null)
+            generatePossibleCaptures(null)
         } else {
             setSelectedSquare(target)
             generatePossibleMoves(target)
+            generatePossibleCaptures(target)
         }
         
     }
@@ -126,7 +122,7 @@ const Board = () => {
             return moves
         }
     }
-    
+   
     const generatePawnMoves = (target, moves) => {
         moves = addMove(target.row+1, target.column, moves)
         if(target.row == 2){
@@ -257,7 +253,6 @@ const Board = () => {
     }
     
     const generatePossibleMoves = (target) => {
-        console.log(target)
         let moves = []
         if(target==null){
             setPossibleMoves([])
@@ -276,6 +271,190 @@ const Board = () => {
         }
         
         setPossibleMoves(moves)
+    }
+
+    const addCapture = (row, column, captures, target) => {
+
+        let square = fetchSquare(row, column)
+        if(squareIsEmpty(square)){
+            return captures
+        } else {
+            if(target.piece.color != square.piece.color){
+                return [...captures, square]
+            }
+            return captures
+        }
+    }
+
+    const generatePawnCaptures = (target, captures) => {
+        if(target.column+1 <= 8) {
+            captures = addCapture(target.row+1, target.column+1, captures, target)
+        }
+        if(target.column-1 > 0){
+            captures = addCapture(target.row+1, target.column-1, captures, target)
+        }
+        return captures
+    }
+    
+    const generateKnightCaptures = (target, captures) => {
+        if(target.row+2 <= 8 && target.column + 1 <= 8){
+            captures = addCapture(target.row+2, target.column+1, captures, target)
+        }
+        if(target.row+2 <= 8 && target.column - 1 > 0){
+            captures = addCapture(target.row+2, target.column-1, captures, target)
+        }
+        if(target.row-2 >0 && target.column + 1 <= 8){
+            captures = addCapture(target.row-2, target.column+1, captures, target)
+        }
+        if(target.row-2 >0 && target.column - 1 > 0){
+            captures = addCapture(target.row-2, target.column-1, captures, target)
+        }
+        if(target.row+1 <= 8 && target.column + 2 <= 8){
+            captures = addCapture(target.row+1, target.column+2, captures, target)
+        }
+        if(target.row+1 <= 8 && target.column - 2 > 0){
+            captures = addCapture(target.row+1, target.column-2, captures, target)
+        }
+        if(target.row-1 > 0 && target.column + 2 <= 8){
+            captures = addCapture(target.row-1, target.column+2, captures, target)
+        }
+        if(target.row-1 > 0 && target.column - 2 > 0){
+            captures = addCapture(target.row-1, target.column-2, captures, target)
+        }
+        return captures
+    }
+    
+    const generateRookCaptures = (target, captures) => {
+        let i = 1
+        while(target.row+i <=8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
+                captures = addCapture(target.row+i, target.column, captures, target)
+                break;
+            }
+            i++
+        }        
+    
+        i =-1
+        while(target.row+i > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
+                captures = addCapture(target.row+i, target.column, captures, target)
+                break;
+            }
+            i--
+        }  
+        
+        i =1
+        while(target.column+i <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
+                captures = addCapture(target.row+i, target.column, captures, target)
+                break;
+            }
+            i++
+        }   
+    
+        i =-1
+        while(target.column+i > 0){
+            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
+                captures = addCapture(target.row+i, target.column, captures, target)
+                break;
+            }
+            i--
+        }   
+    
+        return captures
+    }
+    
+    const generateBishopCaptures = (target, captures) => {
+        let i = 1;
+        let j = 1;
+        while(target.row+i <=8 && target.column + j <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                captures = addCapture(target.row+i, target.column+j, captures, target)
+                break;
+            }
+            i++
+            j++
+        }
+    
+        i = -1;
+        j = 1;
+        while(target.row+i > 0 && target.column + j <= 8){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                captures = addCapture(target.row+i, target.column+j, captures, target)
+                break;
+            }
+            i--
+            j++
+        }
+    
+        i = 1;
+        j = -1;
+        while(target.row+i <=8 && target.column + j > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                captures = addCapture(target.row+i, target.column+j, captures, target)
+                break;
+            }
+            i++
+            j--
+        }
+    
+        i = -1;
+        j = -1;
+        while(target.row+i > 0 && target.column + j > 0){
+            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
+                captures = addCapture(target.row+i, target.column+j, captures, target)
+                break;
+            }
+            i--
+            j--
+        }
+        return captures
+    }
+    
+    const generateQueenCaptures = (target, captures) => {
+        captures = generateBishopCaptures(target, captures)
+        captures = generateRookCaptures(target, captures)
+        return captures
+    }
+
+    const generatePossibleCaptures = (target) => {
+        let captures = []
+        if(target==null){
+            setPossibleCaptures([])
+            return
+        }
+        if(target.piece.type == 'pawn'){
+            captures = generatePawnCaptures(target, captures)
+        } else if(target.piece.type == 'knight'){
+            captures = generateKnightCaptures(target, captures)
+        } else if(target.piece.type == 'bishop'){
+            captures = generateBishopCaptures(target, captures)
+        } else if(target.piece.type == 'rook'){
+            captures = generateRookCaptures(target, captures)
+        } else if(target.piece.type == 'queen'){
+            captures = generateQueenCaptures(target, captures)
+        }
+        
+        setPossibleCaptures(captures)
+    }
+
+    const capturePiece = (target) => {
+        let tempBoard = boardData.filter((ele)=> ele!= selectedSquare && ele!=target)
+        target.piece = selectedSquare.piece
+        selectedSquare.piece = null
+        let newBoard = [...tempBoard, target, selectedSquare]
+        newBoard.sort((a,b)=>{
+            return b.row - a.row || a.column - b.column
+        })
+        setBoardData(newBoard)
+        selectSquare(null)
+        setGameData({
+            moves: gameData.moves+1,
+            turn: 'black',
+            //need changes here
+            halfMoveClock: gameData.halfMoveClock+1
+        })
+        computerTurn()        
     }
 
     const movePiece = (target) => {
@@ -371,6 +550,8 @@ const Board = () => {
                 movePiece={movePiece}
                 possibleMoves={possibleMoves}
                 generatePossibleMoves={generatePossibleMoves}
+                possibleCaptures={possibleCaptures}
+                capturePiece={capturePiece}
             />)
         })
 
