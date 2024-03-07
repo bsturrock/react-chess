@@ -245,3 +245,15 @@
     border-radius: 50%;
     background-color: rgb(67, 67, 205);
 }
+
+.newComp {
+    background-color:aqua !important;
+}
+
+.prevComp {
+    background-color: aquamarine !important;
+}
+
+.square.check {
+    background-color: goldenrod !important;
+}

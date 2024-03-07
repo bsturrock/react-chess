@@ -4,12 +4,17 @@ import './Board.css'
 import Fen from "../scripts/fen"
 import { generateBishopMoves, generateKnightMoves, generatePawnMoves, generateRookMoves, generateQueenMoves } from "../scripts/moves"
 import { generateBishopCaptures, generateKnightCaptures, generatePawnCaptures, generateQueenCaptures, generateRookCaptures } from "../scripts/moves"
+import { checkForCheck } from "../scripts/moves"
 const Board = () => {
 
     const [boardData, setBoardData] = useState([])
     const [selectedSquare, setSelectedSquare] = useState(null)
     const [possibleMoves, setPossibleMoves] = useState([])
     const [possibleCaptures, setPossibleCaptures] = useState([])
+    const [previousComputerSquare, setPreviousComputerSquare] = useState(null)
+    const [newComputerSquare, setNewComputerSquare] = useState(null)
+    const [whiteCheck, setWhiteCheck] = useState(false)
+
     const [gameData, setGameData] = useState({
         turn: 'white',
         moves: 0,
@@ -49,6 +54,9 @@ const Board = () => {
             return b.row - a.row || a.column - b.column
         })
         setBoardData(newBoard)
+        setPreviousComputerSquare(start_square)
+        setNewComputerSquare(end_square)
+        setWhiteCheck(checkForCheck(newBoard))
         setGameData({
             moves: gameData.moves+1,
             turn: 'white',
@@ -65,6 +73,7 @@ const Board = () => {
             let move = await fetchComputerMove()
             move = parseNotationOfMove(move)
             makeComputerMove(move)
+            
 
         },1000)
     }
@@ -195,6 +204,8 @@ const Board = () => {
             })
             setBoardData(newBoard)
             selectSquare(null)
+            setNewComputerSquare(null)
+            setPreviousComputerSquare(null)
             setGameData({
                 moves: gameData.moves+1,
                 turn: 'black',
@@ -267,6 +278,9 @@ const Board = () => {
                 generatePossibleMoves={generatePossibleMoves}
                 possibleCaptures={possibleCaptures}
                 capturePiece={capturePiece}
+                previousComputerSquare={previousComputerSquare}
+                newComputerSquare={newComputerSquare}
+                whiteCheck={whiteCheck}
             />)
         })
 
