@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import Square from "../components/Square"
 import './Board.css'
 import Fen from "../scripts/fen"
+import { generateBishopMoves, generateKnightMoves, generatePawnMoves, generateRookMoves, generateQueenMoves } from "../scripts/moves"
+import { generateBishopCaptures, generateKnightCaptures, generatePawnCaptures, generateQueenCaptures, generateRookCaptures } from "../scripts/moves"
 const Board = () => {
 
     const [boardData, setBoardData] = useState([])
@@ -15,6 +17,9 @@ const Board = () => {
     })
     const fen = new Fen()
 
+    const fetchSquare = (row, column) => {
+        return boardData.filter((ele)=>ele.row==row && ele.column==column)[0]
+    }
 
     const fetchComputerMove = async () => {
         fen.calculatePosition(boardData, gameData)
@@ -105,152 +110,6 @@ const Board = () => {
         }
         
     }
-
-    const squareIsEmpty = (square) => {
-        return square.piece == null
-    }
-
-    const fetchSquare = (row, column) => {
-        return boardData.filter((ele)=>ele.row==row && ele.column==column)[0]
-    }
-
-    const addMove = (row, column, moves) => {
-        let square = fetchSquare(row, column)
-        if(squareIsEmpty(square)){
-            return [...moves, square]
-        } else {
-            return moves
-        }
-    }
-   
-    const generatePawnMoves = (target, moves) => {
-        moves = addMove(target.row+1, target.column, moves)
-        if(target.row == 2){
-            moves = addMove(target.row+2, target.column, moves)
-        }
-        return moves
-    }
-    
-    const generateKnightMoves = (target, moves) => {
-        if(target.row+2 <= 8 && target.column + 1 <= 8){
-            moves = addMove(target.row+2, target.column+1, moves)
-        }
-        if(target.row+2 <= 8 && target.column - 1 > 0){
-            moves = addMove(target.row+2, target.column-1, moves)
-        }
-        if(target.row-2 >0 && target.column + 1 <= 8){
-            moves = addMove(target.row-2, target.column+1, moves)
-        }
-        if(target.row-2 >0 && target.column - 1 > 0){
-            moves = addMove(target.row-2, target.column-1, moves)
-        }
-        if(target.row+1 <= 8 && target.column + 2 <= 8){
-            moves = addMove(target.row+1, target.column+2, moves)
-        }
-        if(target.row+1 <= 8 && target.column - 2 > 0){
-            moves = addMove(target.row+1, target.column-2, moves)
-        }
-        if(target.row-1 > 0 && target.column + 2 <= 8){
-            moves = addMove(target.row-1, target.column+2, moves)
-        }
-        if(target.row-1 > 0 && target.column - 2 > 0){
-            moves = addMove(target.row-1, target.column-2, moves)
-        }
-        return moves
-    }
-    
-    const generateRookMoves = (target, moves) => {
-        let i = 1
-        while(target.row+i <=8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column,moves)
-            i++
-        }        
-    
-        i =-1
-        while(target.row+i > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column,moves)
-            i--
-        }  
-        
-        i =1
-        while(target.column+i <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
-                break;
-            }
-            moves = addMove(target.row, target.column+i,moves)
-            i++
-        }   
-    
-        i =-1
-        while(target.column+i > 0){
-            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
-                break;
-            }
-            moves = addMove(target.row, target.column+i,moves)
-            i--
-        }   
-    
-        return moves
-    }
-    
-    const generateBishopMoves = (target, moves) => {
-        let i = 1;
-        let j = 1;
-        while(target.row+i <=8 && target.column + j <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column+j,moves)
-            i++
-            j++
-        }
-    
-        i = -1;
-        j = 1;
-        while(target.row+i > 0 && target.column + j <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column+j,moves)
-            i--
-            j++
-        }
-    
-        i = 1;
-        j = -1;
-        while(target.row+i <=8 && target.column + j > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column+j,moves)
-            i++
-            j--
-        }
-    
-        i = -1;
-        j = -1;
-        while(target.row+i > 0 && target.column + j > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                break;
-            }
-            moves = addMove(target.row+i, target.column+j,moves)
-            i--
-            j--
-        }
-        return moves
-    }
-    
-    const generateQueenMoves = (target, moves) => {
-        moves = generateBishopMoves(target, moves)
-        moves = generateRookMoves(target, moves)
-        return moves
-    }
     
     const generatePossibleMoves = (target) => {
         let moves = []
@@ -259,162 +118,18 @@ const Board = () => {
             return
         }
         if(target.piece.type == 'pawn'){
-            moves = generatePawnMoves(target, moves)
+            moves = generatePawnMoves(target, moves, boardData)
         } else if(target.piece.type == 'knight'){
-            moves = generateKnightMoves(target, moves)
+            moves = generateKnightMoves(target, moves, boardData)
         } else if(target.piece.type == 'bishop'){
-            moves = generateBishopMoves(target, moves)
+            moves = generateBishopMoves(target, moves, boardData)
         } else if(target.piece.type == 'rook'){
-            moves = generateRookMoves(target, moves)
+            moves = generateRookMoves(target, moves, boardData)
         } else if(target.piece.type == 'queen'){
-            moves = generateQueenMoves(target, moves)
+            moves = generateQueenMoves(target, moves, boardData)
         }
         
         setPossibleMoves(moves)
-    }
-
-    const addCapture = (row, column, captures, target) => {
-
-        let square = fetchSquare(row, column)
-        if(squareIsEmpty(square)){
-            return captures
-        } else {
-            if(target.piece.color != square.piece.color){
-                return [...captures, square]
-            }
-            return captures
-        }
-    }
-
-    const generatePawnCaptures = (target, captures) => {
-        if(target.column+1 <= 8) {
-            captures = addCapture(target.row+1, target.column+1, captures, target)
-        }
-        if(target.column-1 > 0){
-            captures = addCapture(target.row+1, target.column-1, captures, target)
-        }
-        return captures
-    }
-    
-    const generateKnightCaptures = (target, captures) => {
-        if(target.row+2 <= 8 && target.column + 1 <= 8){
-            captures = addCapture(target.row+2, target.column+1, captures, target)
-        }
-        if(target.row+2 <= 8 && target.column - 1 > 0){
-            captures = addCapture(target.row+2, target.column-1, captures, target)
-        }
-        if(target.row-2 >0 && target.column + 1 <= 8){
-            captures = addCapture(target.row-2, target.column+1, captures, target)
-        }
-        if(target.row-2 >0 && target.column - 1 > 0){
-            captures = addCapture(target.row-2, target.column-1, captures, target)
-        }
-        if(target.row+1 <= 8 && target.column + 2 <= 8){
-            captures = addCapture(target.row+1, target.column+2, captures, target)
-        }
-        if(target.row+1 <= 8 && target.column - 2 > 0){
-            captures = addCapture(target.row+1, target.column-2, captures, target)
-        }
-        if(target.row-1 > 0 && target.column + 2 <= 8){
-            captures = addCapture(target.row-1, target.column+2, captures, target)
-        }
-        if(target.row-1 > 0 && target.column - 2 > 0){
-            captures = addCapture(target.row-1, target.column-2, captures, target)
-        }
-        return captures
-    }
-    
-    const generateRookCaptures = (target, captures) => {
-        let i = 1
-        while(target.row+i <=8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
-                captures = addCapture(target.row+i, target.column, captures, target)
-                break;
-            }
-            i++
-        }        
-    
-        i =-1
-        while(target.row+i > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column))){
-                captures = addCapture(target.row+i, target.column, captures, target)
-                break;
-            }
-            i--
-        }  
-        
-        i =1
-        while(target.column+i <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
-                captures = addCapture(target.row+i, target.column, captures, target)
-                break;
-            }
-            i++
-        }   
-    
-        i =-1
-        while(target.column+i > 0){
-            if(!squareIsEmpty(fetchSquare(target.row,target.column+i))){
-                captures = addCapture(target.row+i, target.column, captures, target)
-                break;
-            }
-            i--
-        }   
-    
-        return captures
-    }
-    
-    const generateBishopCaptures = (target, captures) => {
-        let i = 1;
-        let j = 1;
-        while(target.row+i <=8 && target.column + j <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                captures = addCapture(target.row+i, target.column+j, captures, target)
-                break;
-            }
-            i++
-            j++
-        }
-    
-        i = -1;
-        j = 1;
-        while(target.row+i > 0 && target.column + j <= 8){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                captures = addCapture(target.row+i, target.column+j, captures, target)
-                break;
-            }
-            i--
-            j++
-        }
-    
-        i = 1;
-        j = -1;
-        while(target.row+i <=8 && target.column + j > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                captures = addCapture(target.row+i, target.column+j, captures, target)
-                break;
-            }
-            i++
-            j--
-        }
-    
-        i = -1;
-        j = -1;
-        while(target.row+i > 0 && target.column + j > 0){
-            if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j))){
-                captures = addCapture(target.row+i, target.column+j, captures, target)
-                break;
-            }
-            i--
-            j--
-        }
-        return captures
-    }
-    
-    const generateQueenCaptures = (target, captures) => {
-        captures = generateBishopCaptures(target, captures)
-        captures = generateRookCaptures(target, captures)
-        return captures
     }
 
     const generatePossibleCaptures = (target) => {
@@ -424,15 +139,15 @@ const Board = () => {
             return
         }
         if(target.piece.type == 'pawn'){
-            captures = generatePawnCaptures(target, captures)
+            captures = generatePawnCaptures(target, captures, boardData)
         } else if(target.piece.type == 'knight'){
-            captures = generateKnightCaptures(target, captures)
+            captures = generateKnightCaptures(target, captures, boardData)
         } else if(target.piece.type == 'bishop'){
-            captures = generateBishopCaptures(target, captures)
+            captures = generateBishopCaptures(target, captures, boardData)
         } else if(target.piece.type == 'rook'){
-            captures = generateRookCaptures(target, captures)
+            captures = generateRookCaptures(target, captures, boardData)
         } else if(target.piece.type == 'queen'){
-            captures = generateQueenCaptures(target, captures)
+            captures = generateQueenCaptures(target, captures, boardData)
         }
         
         setPossibleCaptures(captures)
