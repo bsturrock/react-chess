@@ -14,6 +14,7 @@ const Board = () => {
     const [previousComputerSquare, setPreviousComputerSquare] = useState(null)
     const [newComputerSquare, setNewComputerSquare] = useState(null)
     const [whiteCheck, setWhiteCheck] = useState(false)
+    const [blackCheck, setBlackCheck] = useState(false)
 
     const [gameData, setGameData] = useState({
         turn: 'white',
@@ -56,7 +57,8 @@ const Board = () => {
         setBoardData(newBoard)
         setPreviousComputerSquare(start_square)
         setNewComputerSquare(end_square)
-        setWhiteCheck(checkForCheck(newBoard))
+        setWhiteCheck(checkForCheck(newBoard, 'white'))
+        setBlackCheck(checkForCheck(newBoard, 'black'))
         setGameData({
             moves: gameData.moves+1,
             turn: 'white',
@@ -172,6 +174,8 @@ const Board = () => {
         })
         setBoardData(newBoard)
         selectSquare(null)
+        setWhiteCheck(checkForCheck(newBoard, 'white'))
+        setBlackCheck(checkForCheck(newBoard, 'black'))
         setGameData({
             moves: gameData.moves+1,
             turn: 'black',
@@ -195,17 +199,28 @@ const Board = () => {
                 newHalfMoveClock++
             }
 
-            let tempBoard = boardData.filter((ele)=> ele!= selectedSquare && ele!=target)
+            let tempBoard = [...boardData].filter((ele)=> ele!= selectedSquare && ele!=target)
             target.piece = selectedSquare.piece
             selectedSquare.piece = null
             let newBoard = [...tempBoard, target, selectedSquare]
             newBoard.sort((a,b)=>{
                 return b.row - a.row || a.column - b.column
             })
+
+            let isWhiteInCheck = checkForCheck(newBoard, 'white')
+            if(isWhiteInCheck && whiteCheck){
+                selectedSquare.piece = target.piece
+                target.piece = null
+                return
+            }
+
             setBoardData(newBoard)
             selectSquare(null)
             setNewComputerSquare(null)
             setPreviousComputerSquare(null)
+
+            setBlackCheck(checkForCheck(newBoard, 'black'))
+            setWhiteCheck(isWhiteInCheck)
             setGameData({
                 moves: gameData.moves+1,
                 turn: 'black',
@@ -281,6 +296,7 @@ const Board = () => {
                 previousComputerSquare={previousComputerSquare}
                 newComputerSquare={newComputerSquare}
                 whiteCheck={whiteCheck}
+                blackCheck={blackCheck}
             />)
         })
 

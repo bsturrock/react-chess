@@ -300,40 +300,79 @@ export const generateQueenCaptures = (target, captures, boardData) => {
     return captures
 }
 
-export const checkForCheck = (boardData) => {
-    let whiteKing = boardData.filter((ele)=>{
-        if(ele.piece == null){
-            return false
-        } else {
-            return ele.piece.type=='king' && ele.piece.color=='white'
+export const checkForCheck = (boardData, color) => {
+    if(color == 'white'){
+        let whiteKing = boardData.filter((ele)=>{
+            if(ele.piece == null){
+                return false
+            } else {
+                return ele.piece.type=='king' && ele.piece.color=='white'
+            }
+            
+        })[0]
+        console.log(whiteKing)
+    
+        let blackBishops = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='bishop' && ele.piece.color=='black'}})
+        let blackKnights = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='knight' && ele.piece.color=='black'}})
+        let blackPawns = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='pawn' && ele.piece.color=='black'}})
+        let blackRooks = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='rook' && ele.piece.color=='black'}})
+        let blackQueen = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='queen' && ele.piece.color=='black'}})
+        let blackPieces = [...blackBishops, ...blackKnights, ...blackPawns, ...blackQueen, ...blackRooks]
+    
+        let captures = []
+        for(let piece of blackPieces){
+            if(piece.piece.type == 'bishop'){
+                captures = generateBishopCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'knight'){
+                captures = generateKnightCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'rook'){
+                captures = generateRookCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'pawn'){
+                captures = generateBlackPawnCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'queen'){
+                captures = generateQueenCaptures(piece,captures,boardData)
+            }
         }
-        
-    })[0]
-    console.log(whiteKing)
-
-    let blackBishops = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='bishop' && ele.piece.color=='black'}})
-    let blackKnights = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='knight' && ele.piece.color=='black'}})
-    let blackPawns = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='pawn' && ele.piece.color=='black'}})
-    let blackRooks = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='rook' && ele.piece.color=='black'}})
-    let blackQueen = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='queen' && ele.piece.color=='black'}})
-    let blackPieces = [...blackBishops, ...blackKnights, ...blackPawns, ...blackQueen, ...blackRooks]
-
-    let captures = []
-    for(let piece of blackPieces){
-        if(piece.piece.type == 'bishop'){
-            captures = generateBishopCaptures(piece,captures,boardData)
-        } else if(piece.piece.type == 'knight'){
-            captures = generateKnightCaptures(piece,captures,boardData)
-        } else if(piece.piece.type == 'rook'){
-            captures = generateRookCaptures(piece,captures,boardData)
-        } else if(piece.piece.type == 'pawn'){
-            captures = generatePawnCaptures(piece,captures,boardData)
-        } else if(piece.piece.type == 'queen'){
-            captures = generateQueenCaptures(piece,captures,boardData)
+        console.log('available captures:', captures)
+        console.log('check:', captures.includes(whiteKing))
+        return captures.includes(whiteKing)
+    
+    } else {
+        let blackKing = boardData.filter((ele)=>{
+            if(ele.piece == null){
+                return false
+            } else {
+                return ele.piece.type=='king' && ele.piece.color=='black'
+            }
+            
+        })[0]
+        console.log(blackKing)
+    
+        let blackBishops = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='bishop' && ele.piece.color=='white'}})
+        let blackKnights = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='knight' && ele.piece.color=='white'}})
+        let blackPawns = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='pawn' && ele.piece.color=='white'}})
+        let blackRooks = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='rook' && ele.piece.color=='white'}})
+        let blackQueen = boardData.filter((ele)=>{ if(ele.piece == null){return false} else { return ele.piece.type=='queen' && ele.piece.color=='white'}})
+        let blackPieces = [...blackBishops, ...blackKnights, ...blackPawns, ...blackQueen, ...blackRooks]
+    
+        let captures = []
+        for(let piece of blackPieces){
+            if(piece.piece.type == 'bishop'){
+                captures = generateBishopCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'knight'){
+                captures = generateKnightCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'rook'){
+                captures = generateRookCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'pawn'){
+                captures = generatePawnCaptures(piece,captures,boardData)
+            } else if(piece.piece.type == 'queen'){
+                captures = generateQueenCaptures(piece,captures,boardData)
+            }
         }
+        console.log('available captures:', captures)
+        console.log('check:', captures.includes(blackKing))
+        return captures.includes(blackKing)
+    
     }
-    console.log('available captures:', captures)
-    console.log('check:', captures.includes(whiteKing))
-    return captures.includes(whiteKing)
 
 }

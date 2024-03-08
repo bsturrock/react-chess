@@ -1,12 +1,15 @@
 import './Square.css'
 
-const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, gameData, possibleCaptures, capturePiece, previousComputerSquare, newComputerSquare, whiteCheck}) => {
+const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, gameData, possibleCaptures, capturePiece, previousComputerSquare, newComputerSquare, whiteCheck, blackCheck}) => {
 
     const {piece} = data
-    const isWhite = piece==null ? false : piece.color=='white' ? true : false
+    const isWhite = piece == null ? false : piece.color == 'white' ? true : false
+    const isBlack = piece == null ? false : piece.color == 'black' ? true : false
 
     const kingInCheckClass = () => {
         if(isWhite && piece.type == 'king' && whiteCheck){
+            return ' check'
+        } else if (isBlack && piece.type == 'king' && blackCheck){
             return ' check'
         } else {
             return ''
