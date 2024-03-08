@@ -30,11 +30,8 @@ const Board = () => {
     const fetchComputerMove = async () => {
         fen.calculatePosition(boardData, gameData)
 
-        console.log(fen.position)
-
         let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=2&mode=bestmove')
         let res_json = await res.json()
-        console.log(res_json)
         return res_json
     }
 
@@ -65,9 +62,6 @@ const Board = () => {
             //need changes here
             halfMoveClock: gameData.halfMoveClock+1
         })        
-
-
-
     }
 
     const computerTurn = () => {
@@ -75,8 +69,6 @@ const Board = () => {
             let move = await fetchComputerMove()
             move = parseNotationOfMove(move)
             makeComputerMove(move)
-            
-
         },1000)
     }
 
@@ -165,28 +157,64 @@ const Board = () => {
     }
 
     const capturePiece = (target) => {
-        let tempBoard = boardData.filter((ele)=> ele!= selectedSquare && ele!=target)
-        target.piece = selectedSquare.piece
-        selectedSquare.piece = null
-        let newBoard = [...tempBoard, target, selectedSquare]
+
+        let newHalfMoveClock = gameData.halfMoveClock
+        if(selectedSquare.piece.type != 'pawn'){
+            newHalfMoveClock++
+        }
+
+        //create copies of boardData
+        let boardDataCopy = [...boardData]
+        let targetCopy = boardDataCopy.filter((ele)=>ele==target)[0]
+        let selectedSquareCopy = boardData.filter((ele)=>ele==selectedSquare)[0]
+        let tempBoard = boardDataCopy.filter((ele)=> ele!= selectedSquareCopy && ele!=targetCopy)
+
+        //exchange pieces between squares
+        let enemyPiece = targetCopy.piece
+        targetCopy.piece = selectedSquareCopy.piece
+        selectedSquareCopy.piece = null
+
+        //create prelimanary newBoard
+        let newBoard = [...tempBoard, targetCopy, selectedSquareCopy]
         newBoard.sort((a,b)=>{
             return b.row - a.row || a.column - b.column
         })
+
+        //see if new board contains a check for white
+        let isWhiteInCheck = checkForCheck(newBoard, 'white')
+
+        //undo these moves if it would put white in check
+        if(isWhiteInCheck){
+            selectedSquareCopy.piece = targetCopy.piece
+            targetCopy.piece = enemyPiece
+            return
+        }
+
+        //otherwise set new board data
         setBoardData(newBoard)
         selectSquare(null)
-        setWhiteCheck(checkForCheck(newBoard, 'white'))
+        setNewComputerSquare(null)
+        setPreviousComputerSquare(null)
+
+        //check for checks in newBoard
         setBlackCheck(checkForCheck(newBoard, 'black'))
+        setWhiteCheck(isWhiteInCheck)
+
+        //update gameData
         setGameData({
             moves: gameData.moves+1,
             turn: 'black',
             //need changes here
-            halfMoveClock: gameData.halfMoveClock+1
-        })
-        computerTurn()        
+            halfMoveClock: newHalfMoveClock
+        })    
+
+        //start computer turn
+        computerTurn()   
     }
 
     const movePiece = (target) => {
         
+        //
         if(target.piece!=null){
             selectSquare(target)
             return
@@ -199,34 +227,51 @@ const Board = () => {
                 newHalfMoveClock++
             }
 
-            let tempBoard = [...boardData].filter((ele)=> ele!= selectedSquare && ele!=target)
-            target.piece = selectedSquare.piece
-            selectedSquare.piece = null
-            let newBoard = [...tempBoard, target, selectedSquare]
+            //create copies of boardData
+            let boardDataCopy = [...boardData]
+            let targetCopy = boardDataCopy.filter((ele)=>ele==target)[0]
+            let selectedSquareCopy = boardData.filter((ele)=>ele==selectedSquare)[0]
+            let tempBoard = boardDataCopy.filter((ele)=> ele!= selectedSquareCopy && ele!=targetCopy)
+
+            //exchange pieces between squares
+            targetCopy.piece = selectedSquareCopy.piece
+            selectedSquareCopy.piece = null
+
+            //create prelimanary newBoard
+            let newBoard = [...tempBoard, targetCopy, selectedSquareCopy]
             newBoard.sort((a,b)=>{
                 return b.row - a.row || a.column - b.column
             })
 
+            //see if new board contains a check for white
             let isWhiteInCheck = checkForCheck(newBoard, 'white')
-            if(isWhiteInCheck && whiteCheck){
-                selectedSquare.piece = target.piece
-                target.piece = null
+
+            //undo these moves if it would put white in check
+            if(isWhiteInCheck){
+                selectedSquareCopy.piece = targetCopy.piece
+                targetCopy.piece = null
                 return
             }
 
+            //otherwise set new board data
             setBoardData(newBoard)
             selectSquare(null)
             setNewComputerSquare(null)
             setPreviousComputerSquare(null)
 
+            //check for checks in newBoard
             setBlackCheck(checkForCheck(newBoard, 'black'))
             setWhiteCheck(isWhiteInCheck)
+
+            //update gameData
             setGameData({
                 moves: gameData.moves+1,
                 turn: 'black',
                 //need changes here
                 halfMoveClock: newHalfMoveClock
             })
+
+            //start computer turn
             computerTurn()
         }
         
