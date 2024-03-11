@@ -300,6 +300,27 @@ export const generateQueenCaptures = (target, captures, boardData) => {
     return captures
 }
 
+export const generateKingCastles = (target, boardData) => {
+    let castles = []
+    
+    if(target.piece.type != 'king'){return castles}
+
+    target.piece.checkCastleStatus(boardData)
+
+    if(!target.piece.canCastleKing && !target.piece.canCastleQueen){return castles}
+    if(target.piece.hasMoved){return castles}
+
+    if(target.piece.canCastleKing){
+        castles = addMove(1,7,castles,boardData)
+    }
+    if(target.piece.canCastleQueen){
+        castles = addMove(1,3,castles,boardData)
+    }
+    return castles
+
+
+}
+
 export const generateKingMoves = (target, moves, boardData) => {
     if(target.row+1 <= 8 && target.column+1 <= 8){
         moves = addMove(target.row+1,target.column+1,moves,boardData)

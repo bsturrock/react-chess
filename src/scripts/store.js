@@ -5,14 +5,17 @@ class Piece {
         this.color = color;
         this.rank = rank;
         this.file = file;
+        this.hasMoved = false;
     }
 }
 
 class Pawn extends Piece {
     constructor(color, rank, file){
         super(color, rank, file)
-        this.hasMoved = false
         this.type = 'pawn'
+    }
+    promote(){
+        return new Queen(this.color, this.rank, this.file)
     }
 }
 
@@ -47,9 +50,40 @@ class Queen extends Piece {
 class King extends Piece {
     constructor(color, rank, file){
         super(color, rank, file)
-        this.hasMoved = false
-        this.canCastle = true
+        this.canCastleKing = false
+        this.canCastleQueen = false
         this.type = 'king'
+    }
+    
+    checkCastleStatus(board){
+        if(this.hasMoved){this.canCastleKing = false; this.canCastleQueen=false; return}
+        if(this.color == 'white'){
+            let bishopSpot = board.filter((ele)=>ele.column == 6 && ele.row == 1)[0]
+            let knightSpot = board.filter((ele)=>ele.column == 7 && ele.row == 1)[0]
+            let rookSpot = board.filter((ele)=>ele.column == 8 && ele.row == 1)[0]
+            if(bishopSpot.piece == null && knightSpot.piece == null && rookSpot.piece != null && rookSpot.piece.hasMoved == false){
+                this.canCastleKing = true
+                console.log('can castle')
+
+            } else {
+                this.canCastleKing = false
+                console.log('bishopSpot.piece: ', bishopSpot.piece)
+                console.log('knightSpot.piece: ', knightSpot.piece)
+                console.log('rookSpot.piece: ', rookSpot.piece)
+
+            }
+            let queenSpot = board.filter((ele)=>ele.column == 4 && ele.row == 1)[0]
+            bishopSpot = board.filter((ele)=>ele.column == 3 && ele.row == 1)[0]
+            knightSpot = board.filter((ele)=>ele.column == 2 && ele.row == 1)[0]
+            rookSpot = board.filter((ele)=>ele.column == 1 && ele.row == 1)[0]
+
+            if(bishopSpot.piece == null && knightSpot.piece == null && rookSpot.piece != null && rookSpot.piece.hasMoved == false && queenSpot.piece == null){
+                this.canCastleQueen = true
+            } else {
+                this.canCastleQueen = false
+            }
+        }
+        console.log(this)
     }
 }
 
@@ -107,12 +141,18 @@ const useStore = create((set)=>({
     clearActiveSquare: () => set({activeSquare: null}),
     hasActiveSquare: false,
     setHasActiveSquare: (bool) => set({hasActiveSquare: bool}),
+    
     possibleMoves: [],
     setPossibleMoves: (moves) => set({possibleMoves: moves}),
     clearPossibleMoves: ()=> set({possibleMoves:[]}),
+    
     possibleCaptures: [],
     setPossibleCaptures: (captures) => set({possibleCaptures: captures}),
-    clearPossibleCaptures: ()=> set({possibleCaptures:[]})
+    clearPossibleCaptures: () => set({possibleCaptures:[]}),
+
+    possibleCastles: [],
+    setPossibleCastles: (castles) => set({possibleCastles: castles}),
+    clearPossibleCastles: () => set({possibleCastles: []})
 }))
 
 export default useStore
