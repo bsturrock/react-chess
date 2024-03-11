@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Square from "../components/Square"
 import './Board.css'
 import Fen from "../scripts/fen"
-import { generateBishopMoves, generateKnightMoves, generatePawnMoves, generateRookMoves, generateQueenMoves } from "../scripts/moves"
+import { generateBishopMoves, generateKnightMoves, generatePawnMoves, generateRookMoves, generateQueenMoves, generateKingMoves } from "../scripts/moves"
 import { generateBishopCaptures, generateKnightCaptures, generatePawnCaptures, generateQueenCaptures, generateRookCaptures } from "../scripts/moves"
 import { checkForCheck } from "../scripts/moves"
 const Board = () => {
@@ -19,56 +19,86 @@ const Board = () => {
     const [gameData, setGameData] = useState({
         turn: 'white',
         moves: 0,
-        halfMoveClock: 0
+        halfMoveClock: 0,
+        whiteCanCastle: true,
+        blackCanCastle: true,
     })
+
     const fen = new Fen()
 
     const fetchSquare = (row, column) => {
         return boardData.filter((ele)=>ele.row==row && ele.column==column)[0]
     }
 
-    const fetchComputerMove = async () => {
-        fen.calculatePosition(boardData, gameData)
-
+    const fetchComputerMove = async (newBoard) => {
+        fen.calculatePosition(newBoard, gameData)
         let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=2&mode=bestmove')
         let res_json = await res.json()
         return res_json
     }
 
-    const makeComputerMove = (move) => {
-
+    const makeComputerMove = (move, newGameData) => {
         // let newHalfMoveClock = gameData.halfMoveClock
         // if(selectedSquare.piece.type != 'pawn'){
         //     newHalfMoveClock++
         // }
-
+        let castling = false
         let start_square = fetchSquare(move.start.row, move.start.column)
         let end_square = fetchSquare(move.end.row, move.end.column)
-        let tempBoard = boardData.filter((ele)=> ele!= start_square && ele!=end_square)
+        let oldRookSpace = fetchSquare(8,8)
+        let newRookSpace = fetchSquare(8,6)
+
+        let tempBoard = []
+
+        console.log(newGameData.blackCanCastle, start_square.piece, end_square.row, end_square.column)
+
+
+        if(newGameData.blackCanCastle && start_square.piece.type == 'king' && end_square.row == 8 && end_square.column == 7){
+            console.log('BLACK IS CASTLING')
+            castling = true
+            tempBoard = boardData.filter((ele)=> ele!= start_square && ele!=end_square && ele!=oldRookSpace && ele!=newRookSpace)
+        } else {
+            tempBoard = boardData.filter((ele)=> ele!= start_square && ele!=end_square)
+        }
+ 
         end_square.piece = start_square.piece
         start_square.piece = null
-        let newBoard = [...tempBoard, start_square, end_square]
+        let newBoard = []
+
+        if(castling){
+            newRookSpace.piece = oldRookSpace.piece
+            oldRookSpace.piece = null
+            newBoard = [...tempBoard, start_square, end_square, oldRookSpace, newRookSpace]
+        } else {
+            newBoard = [...tempBoard, start_square, end_square]
+        }
+
         newBoard.sort((a,b)=>{
             return b.row - a.row || a.column - b.column
         })
+
+
+
         setBoardData(newBoard)
         setPreviousComputerSquare(start_square)
         setNewComputerSquare(end_square)
         setWhiteCheck(checkForCheck(newBoard, 'white'))
         setBlackCheck(checkForCheck(newBoard, 'black'))
         setGameData({
-            moves: gameData.moves+1,
+            moves: newGameData.moves+1,
             turn: 'white',
             //need changes here
-            halfMoveClock: gameData.halfMoveClock+1
-        })        
+            halfMoveClock: newGameData.halfMoveClock+1,
+            whiteCanCastle: newGameData.whiteCanCastle,
+            blackCanCastle: !castling
+        })       
     }
 
-    const computerTurn = () => {
+    const computerTurn = (newGameData, newBoard) => {
         setTimeout( async ()=>{
-            let move = await fetchComputerMove()
+            let move = await fetchComputerMove(newBoard)
             move = parseNotationOfMove(move)
-            makeComputerMove(move)
+            makeComputerMove(move, newGameData)
         },1000)
     }
 
@@ -130,6 +160,8 @@ const Board = () => {
             moves = generateRookMoves(target, moves, boardData)
         } else if(target.piece.type == 'queen'){
             moves = generateQueenMoves(target, moves, boardData)
+        } else if(target.piece.type == 'king'){
+            moves = generateKingMoves(target, moves, boardData, gameData)
         }
         
         setPossibleMoves(moves)
@@ -200,16 +232,15 @@ const Board = () => {
         setBlackCheck(checkForCheck(newBoard, 'black'))
         setWhiteCheck(isWhiteInCheck)
 
-        //update gameData
-        setGameData({
+        //start computer turn
+        computerTurn({
             moves: gameData.moves+1,
             turn: 'black',
             //need changes here
-            halfMoveClock: newHalfMoveClock
-        })    
-
-        //start computer turn
-        computerTurn()   
+            halfMoveClock: newHalfMoveClock,
+            whiteCanCastle: gameData.whiteCanCastle,
+            blackCanCastle: gameData.blackCanCastle
+        }, newBoard)   
     }
 
     const movePiece = (target) => {
@@ -222,6 +253,8 @@ const Board = () => {
 
         if(possibleMoves.includes(target)){
 
+            let castling = false
+
             let newHalfMoveClock = gameData.halfMoveClock
             if(selectedSquare.piece.type != 'pawn'){
                 newHalfMoveClock++
@@ -230,18 +263,39 @@ const Board = () => {
             //create copies of boardData
             let boardDataCopy = [...boardData]
             let targetCopy = boardDataCopy.filter((ele)=>ele==target)[0]
-            let selectedSquareCopy = boardData.filter((ele)=>ele==selectedSquare)[0]
-            let tempBoard = boardDataCopy.filter((ele)=> ele!= selectedSquareCopy && ele!=targetCopy)
+            let selectedSquareCopy = boardDataCopy.filter((ele)=>ele==selectedSquare)[0]
+            let oldRookSpace = boardDataCopy.filter((ele)=>ele.row == 1 && ele.column == 8)[0]
+            let newRookSpace = boardDataCopy.filter((ele)=>ele.row == 1 && ele.column == 6)[0]
+            let tempBoard = boardDataCopy.filter((ele)=> ele!= selectedSquareCopy && ele!=targetCopy && ele!=oldRookSpace && ele!=newRookSpace)
+
+            //castling
+            if(selectedSquareCopy.piece.type=='king' && targetCopy.column == 7){
+                castling = true
+            }
 
             //exchange pieces between squares
             targetCopy.piece = selectedSquareCopy.piece
             selectedSquareCopy.piece = null
 
+            if(castling){
+                newRookSpace.piece = oldRookSpace.piece
+                oldRookSpace.piece = null
+            }
+
             //create prelimanary newBoard
-            let newBoard = [...tempBoard, targetCopy, selectedSquareCopy]
+            let newBoard = []
+            if(selectedSquareCopy==newRookSpace || targetCopy==newRookSpace){
+                newBoard = [...tempBoard, targetCopy, selectedSquareCopy, oldRookSpace]
+            } else if(selectedSquareCopy == oldRookSpace || targetCopy == oldRookSpace){
+                newBoard = [...tempBoard, targetCopy, selectedSquareCopy, newRookSpace]
+            } else {
+                newBoard = [...tempBoard, targetCopy, selectedSquareCopy, oldRookSpace, newRookSpace]
+            }
+
             newBoard.sort((a,b)=>{
                 return b.row - a.row || a.column - b.column
             })
+
 
             //see if new board contains a check for white
             let isWhiteInCheck = checkForCheck(newBoard, 'white')
@@ -250,6 +304,10 @@ const Board = () => {
             if(isWhiteInCheck){
                 selectedSquareCopy.piece = targetCopy.piece
                 targetCopy.piece = null
+                if(castling){
+                    oldRookSpace.piece = {type: 'rook', color: 'white'}
+                    newRookSpace.piece = null
+                }
                 return
             }
 
@@ -264,15 +322,20 @@ const Board = () => {
             setWhiteCheck(isWhiteInCheck)
 
             //update gameData
-            setGameData({
+
+            let newCastling = true
+            if(castling){
+                newCastling = false
+            }
+
+            //start computer turn with updated gameData
+            computerTurn({
                 moves: gameData.moves+1,
                 turn: 'black',
-                //need changes here
-                halfMoveClock: newHalfMoveClock
-            })
-
-            //start computer turn
-            computerTurn()
+                halfMoveClock: newHalfMoveClock,
+                whiteCanCastle: newCastling,
+                blackCanCastle: gameData.blackCanCastle
+            }, newBoard)
         }
         
 

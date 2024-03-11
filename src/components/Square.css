@@ -17,6 +17,13 @@
     background-color: navy;
 }
 
+.square.active {
+    background-color: navy;
+}
+.square.active:hover {
+    cursor: pointer;
+    background-color: rgb(32, 32, 154) !important;
+}
 .square.dark.hoverable:hover {
     cursor: pointer;
     background-color: rgb(119, 44, 12);
@@ -24,7 +31,7 @@
 
 .square.light.hoverable:hover {
     cursor: pointer;
-    background-color: rgb(255, 246, 227);
+    background-color: rgb(228, 215, 186);
 }
 
 .square.selected:hover {

@@ -34,10 +34,12 @@ const Square = ({data, selectedSquare, selectSquare, movePiece, possibleMoves, g
 
     const handleClick = () => {
 
+        //fail if not white turn
         if(gameData.turn!='white'){
             return
         }
 
+        //fail if its not a move, capture or white piece
         if(!isPossibleMove() && !isPossibleCapture() && !isWhite){
             return
         }

@@ -1,12 +1,13 @@
 
 import './App.css'
-import Board from './features/Board'
+// import Board from './features/Board'
+import NewBoard from './features/NewBoard'
 function App() {
 
 
   return (
     <>
-      <Board/>
+      <NewBoard/>
     </>
   )
 }

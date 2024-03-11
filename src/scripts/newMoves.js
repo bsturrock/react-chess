@@ -18,7 +18,7 @@ const addMove = (row, column, moves, boardData) => {
 
 export const generatePawnMoves = (target, moves, boardData) => {
     moves = addMove(target.row+1, target.column, moves, boardData)
-    if(target.row == 2){
+    if(!target.piece.hasMoved){
         moves = addMove(target.row+2, target.column, moves, boardData)
     }
     return moves
@@ -149,7 +149,7 @@ export const generateQueenMoves = (target, moves, boardData) => {
 const addCapture = (row, column, captures, target, boardData) => {
 
     let square = fetchSquare(row, column, boardData)
-    if(squareIsEmpty(square)){
+    if(squareIsEmpty(square) || square.piece.type == 'king'){
         return captures
     } else {
         if(target.piece.color != square.piece.color){
@@ -300,8 +300,7 @@ export const generateQueenCaptures = (target, captures, boardData) => {
     return captures
 }
 
-export const generateKingMoves = (target, moves, boardData, gameData) => {
-    console.log(gameData)
+export const generateKingMoves = (target, moves, boardData) => {
     if(target.row+1 <= 8 && target.column+1 <= 8){
         moves = addMove(target.row+1,target.column+1,moves,boardData)
     }
@@ -326,18 +325,36 @@ export const generateKingMoves = (target, moves, boardData, gameData) => {
     if(target.column+1 <= 8){
         moves = addMove(target.row,target.column+1,moves,boardData)
     }
+    return moves
+}
 
-    if(gameData.whiteCanCastle){
-
-        if(squareIsEmpty(fetchSquare(target.row, target.column+1, boardData))){
-
-            if(squareIsEmpty(fetchSquare(target.row, target.column+2, boardData))){
-                moves = addMove(target.row, target.column+2,moves,boardData)
-            }
-        }
+export const generateKingCaptures = (target, captures, boardData) => {
+    if(target.row+1 <= 8 && target.column+1 <= 8){
+        captures = addCapture(target.row+1, target.column+1, captures, target, boardData)
+    }
+    if(target.row-1 > 0 && target.column+1 <= 8){
+        captures = addCapture(target.row-1,target.column+1,captures, target, boardData)
+    }
+    if(target.row+1 <= 8 && target.column-1 > 0){
+        captures = addCapture(target.row+1,target.column-1,captures, target, boardData)
+    }
+    if(target.row-1 > 0 && target.column-1 > 0){
+        captures = addCapture(target.row-1,target.column-1,captures, target, boardData)
+    }
+    if(target.row+1 <= 8){
+        captures = addCapture(target.row+1,target.column,captures,target, boardData)
+    }
+    if(target.row-1 > 0 ){
+        captures = addCapture(target.row-1,target.column,captures,target, boardData)
+    }
+    if(target.column-1 > 0 ){
+        captures = addCapture(target.row,target.column-1,captures,target, boardData)
+    }
+    if(target.column+1 <= 8){
+        captures = addCapture(target.row,target.column+1,captures,target, boardData)
     }
 
-    return moves
+    return captures
 }
 
 export const checkForCheck = (boardData, color) => {
