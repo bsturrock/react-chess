@@ -13,6 +13,7 @@ class Pawn extends Piece {
     constructor(color, rank, file){
         super(color, rank, file)
         this.type = 'pawn'
+        this.canEnPassant = false
     }
     promote(){
         return new Queen(this.color, this.rank, this.file)
@@ -52,26 +53,27 @@ class King extends Piece {
         super(color, rank, file)
         this.canCastleKing = false
         this.canCastleQueen = false
+        this.castleKingAvailable = true
+        this.castleQueenAvailable = true
         this.type = 'king'
     }
     
     checkCastleStatus(board){
-        if(this.hasMoved){this.canCastleKing = false; this.canCastleQueen=false; return}
+        if(this.hasMoved){this.canCastleKing = false; this.canCastleQueen=false; this.castleKingAvailable = false; this.castleQueenAvailable = false; return}
         if(this.color == 'white'){
             let bishopSpot = board.filter((ele)=>ele.column == 6 && ele.row == 1)[0]
             let knightSpot = board.filter((ele)=>ele.column == 7 && ele.row == 1)[0]
             let rookSpot = board.filter((ele)=>ele.column == 8 && ele.row == 1)[0]
+
             if(bishopSpot.piece == null && knightSpot.piece == null && rookSpot.piece != null && rookSpot.piece.hasMoved == false){
                 this.canCastleKing = true
-                console.log('can castle')
-
+            } else if (bishopSpot.piece == null && knightSpot.piece == null && (rookSpot.piece==null || rookSpot.piece.hasMoved == true)){
+                this.castleKingAvailable = false
+                this.canCastleKing = false
             } else {
                 this.canCastleKing = false
-                console.log('bishopSpot.piece: ', bishopSpot.piece)
-                console.log('knightSpot.piece: ', knightSpot.piece)
-                console.log('rookSpot.piece: ', rookSpot.piece)
-
             }
+
             let queenSpot = board.filter((ele)=>ele.column == 4 && ele.row == 1)[0]
             bishopSpot = board.filter((ele)=>ele.column == 3 && ele.row == 1)[0]
             knightSpot = board.filter((ele)=>ele.column == 2 && ele.row == 1)[0]
@@ -79,7 +81,10 @@ class King extends Piece {
 
             if(bishopSpot.piece == null && knightSpot.piece == null && rookSpot.piece != null && rookSpot.piece.hasMoved == false && queenSpot.piece == null){
                 this.canCastleQueen = true
-            } else {
+            } else if (bishopSpot.piece == null && knightSpot.piece == null && (rookSpot.piece==null || rookSpot.piece.hasMoved == true)){
+                this.castleQueenAvailable = false
+                this.canCastleQueen = false
+            }  else {
                 this.canCastleQueen = false
             }
         }
@@ -152,7 +157,11 @@ const useStore = create((set)=>({
 
     possibleCastles: [],
     setPossibleCastles: (castles) => set({possibleCastles: castles}),
-    clearPossibleCastles: () => set({possibleCastles: []})
+    clearPossibleCastles: () => set({possibleCastles: []}),
+
+    possibleEnPassant: [],
+    setPossibleEnPassant: (captures) => set({possibleEnPassant: captures}),
+    clearPossibleEnPassant: () => set({possibleEnPassant: []})
 }))
 
 export default useStore

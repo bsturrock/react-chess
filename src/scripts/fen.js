@@ -1,14 +1,21 @@
 
+
 class Fen{
     constructor(){
         this.position = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+        this.moves = 0
     }
 
-    calculatePosition(boardData, gameData){
+    calculatePosition(boardData, turn){
+        this.moves++
         let boardDataCopy = [...boardData].reverse()
         let mystr = ''
         let rank = 8
         let file = 1
+        let whiteKing = boardDataCopy.filter((ele)=>ele.piece!= null && ele.piece.type == 'king' && ele.piece.color == 'white')[0]
+        let blackKing = boardDataCopy.filter((ele)=>ele.piece!= null && ele.piece.type == 'king' && ele.piece.color == 'black')[0]
+        whiteKing.piece.checkCastleStatus(boardData)
+        blackKing.piece.checkCastleStatus(boardData)
 
         for(rank= 8;rank>0;rank--){
             let counter = 0
@@ -65,21 +72,39 @@ class Fen{
 
         mystr = mystr.slice(0,mystr.length-1)
 
-        if(gameData.turn == 'white'){
-            mystr += ' b'
-        } else {
+        if(turn == 'white'){
             mystr += ' w'
+        } else {
+            mystr += ' b'
         }
 
         //castling
-        mystr += ' KQkq'
+        let castleString = ' '
+        if(whiteKing.piece.castleKingAvailable){
+            castleString+= 'K'
+        }
+        if(whiteKing.piece.castleQueenAvailable){
+            castleString+= 'Q'
+        }
+        if(blackKing.piece.castleKingAvailable){
+            castleString+= 'k'
+        }
+        if(blackKing.piece.castleQueenAvailable){
+            castleString+= 'q'
+        }
+
+        if(castleString == ' '){
+            castleString = ' -'
+        }
+
+        mystr += castleString
 
         //en passant
         mystr += ' -'
 
-        mystr += ' ' + gameData.halfMoveClock
+        mystr += ' ' + this.moves
 
-        mystr += ' ' + gameData.moves
+        mystr += ' ' + this.moves
 
         this.position = mystr
 
