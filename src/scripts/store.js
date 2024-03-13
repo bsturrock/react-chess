@@ -88,7 +88,6 @@ class King extends Piece {
                 this.canCastleQueen = false
             }
         }
-        console.log(this)
     }
 }
 
@@ -161,7 +160,17 @@ const useStore = create((set)=>({
 
     possibleEnPassant: [],
     setPossibleEnPassant: (captures) => set({possibleEnPassant: captures}),
-    clearPossibleEnPassant: () => set({possibleEnPassant: []})
+    clearPossibleEnPassant: () => set({possibleEnPassant: []}),
+
+    checks: [],
+    setChecks: (checks) => set({checks: checks}),
+    clearChecks: () => set({checks:[]}),
+
+    startComputerMove: null,
+    endComputerMove: null,
+    setStartComputerMove: (move) => set({startComputerMove: move}),
+    setEndComputerMove: (move) => set({endComputerMove: move}),
+    clearComputerMoves: () => set({startComputerMove: null, endComputerMove: null})
 }))
 
 export default useStore

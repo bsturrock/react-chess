@@ -3,6 +3,8 @@ import useStore from "../scripts/store"
 import './Board.css'
 import { useEffect } from "react"
 import Fen from "../scripts/fen"
+import { generateBishopCaptures, generatePawnCaptures,generateQueenCaptures, generateKnightCaptures, generateRookCaptures, generateBlackPawnCaptures } from '../scripts/newMoves'
+
 const NewBoard = () => {
 
     const board = useStore((store)=>store.board)
@@ -10,6 +12,9 @@ const NewBoard = () => {
     const turn = useStore((store)=>store.turn)
     const setBoard = useStore((store)=>store.setBoard)
     const setTurn = useStore((store)=>store.setTurn)
+    const setChecks = useStore((store)=>store.setChecks)
+    const setStartComputerMove = useStore((store)=>store.setStartComputerMove)
+    const setEndComputerMove = useStore((store)=>store.setEndComputerMove)
 
     const fen = new Fen()
 
@@ -27,8 +32,9 @@ const NewBoard = () => {
         }
         move = move.data
 
-        const [x, move1, y, move2] = move.split(' ')
-        const moves = [move1]
+        let moves = move.split(' ')
+        moves = [moves[1]]
+
 
         const parsedMoves = moves.map((ele)=>{
             let start = ele.substring(0,2)
@@ -51,10 +57,54 @@ const NewBoard = () => {
     const fetchComputerMove = async () => {
         let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=1&mode=bestmove')
         let res_json = await res.json()
-        console.log(res_json)
         let move = parseNotationOfMove(res_json)
-        console.log(move)
         return move
+    }
+
+    const checkForCheck = (newBoard) => {
+
+        let whiteCaptures = []
+        let whiteSquares = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'white');
+        
+        for(let square of whiteSquares){
+            if(square.piece == null){continue}
+            if(square.piece.type == 'pawn'){
+                whiteCaptures = generatePawnCaptures(square, whiteCaptures, newBoard, true)
+            } else if (square.piece.type == 'bishop'){
+                whiteCaptures = generateBishopCaptures(square, whiteCaptures, newBoard, true)
+            } else if (square.piece.type == 'knight'){
+                whiteCaptures = generateKnightCaptures(square, whiteCaptures, newBoard, true)
+            } else if (square.piece.type == 'rook'){
+                whiteCaptures = generateRookCaptures(square, whiteCaptures, newBoard, true)
+            } else if (square.piece.type == 'queen'){
+                whiteCaptures = generateQueenCaptures(square, whiteCaptures, newBoard, true)
+            }
+        }
+
+        let blackCaptures = []
+        let blackSquares = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'black');
+        
+        for(let square of blackSquares){
+            if(square.piece == null){continue}
+            if(square.piece.type == 'pawn'){
+                blackCaptures = generateBlackPawnCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'bishop'){
+                blackCaptures = generateBishopCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'knight'){
+                blackCaptures = generateKnightCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'rook'){
+                blackCaptures = generateRookCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'queen'){
+                blackCaptures = generateQueenCaptures(square, blackCaptures, newBoard, true)
+            }
+        }
+
+        return {
+            whiteInCheck: blackCaptures.length > 0,
+            blackInCheck: whiteCaptures.length > 0,
+            allchecks: [...whiteCaptures, ...blackCaptures]
+        }
+
     }
 
     const buildPotentialBoardAfterCastle = (start, end) => {
@@ -118,19 +168,30 @@ const NewBoard = () => {
     const makeComputerMove = (move) => {
         const {start, end} = move
         let newBoard
-        if(start.row == 8 && start.column == 5 && end.row == 8 && end.column == 7){
+        let startSquare = board.filter((ele)=>ele.row == start.row && ele.column == start.column)[0]
+        if(start.row == 8 && start.column == 5 && end.row == 8 && end.column == 7 && startSquare.piece.type == 'king' && startSquare.piece.color == 'black'){
             newBoard = buildPotentialBoardAfterCastle(start, end)
-        } else if(start.row == 8 && start.column == 5 && end.row == 8 && end.column == 3) {
+        } else if(start.row == 8 && start.column == 5 && end.row == 8 && end.column == 3 && startSquare.piece.type == 'king' && startSquare.piece.color == 'black') {
             newBoard = buildPotentialBoardAfterCastle(start, end)
         } else {
             newBoard = buildPotentialBoard(start, end)
         }
 
-                //If won't be in check
         setBoard(newBoard)
         setTurn('white')
 
+        const {row:startRow, column:startCol} = start
+        const {row:endRow, column:endCol} = end
+
+        let xStartSquare = [...newBoard].filter((ele)=>ele.row == startRow && ele.column == startCol)[0]
+        let xEndSquare = [...newBoard].filter((ele)=>ele.row == endRow && ele.column == endCol)[0]
+
+        setStartComputerMove(xStartSquare)
+        setEndComputerMove(xEndSquare)
+
     }
+
+
 
     useEffect(()=>{
 
@@ -139,11 +200,20 @@ const NewBoard = () => {
             console.log(fen.position)
             setTimeout(async () => {
                 let move = await fetchComputerMove()
+                console.log(move)
                 makeComputerMove(move)
             },1000)
-            
         }
+
     }, [turn])
+
+    useEffect(()=>{
+        console.log('use effect for check')
+        if(turn == 'white'){
+            let {allchecks} = checkForCheck(board)
+            setChecks(allchecks)
+        }
+    },[board])
 
     return <>
         <div className="board">

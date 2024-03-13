@@ -195,6 +195,10 @@
     background-image: url('static/images/black_king.png');
 }
 
+.square.check{
+    background-color: rgb(255, 115, 0)
+}
+
 .square.move::after {
     content: '';
     position: absolute;
@@ -287,8 +291,4 @@
 
 .prevComp {
     background-color: aquamarine !important;
-}
-
-.square.check {
-    background-color: goldenrod !important;
 }

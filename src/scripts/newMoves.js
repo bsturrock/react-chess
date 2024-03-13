@@ -146,72 +146,84 @@ export const generateQueenMoves = (target, moves, boardData) => {
 }
 
 
-const addCapture = (row, column, captures, target, boardData) => {
+const addCapture = (row, column, captures, target, boardData, checks=false) => {
 
     let square = fetchSquare(row, column, boardData)
-    if(squareIsEmpty(square) || square.piece.type == 'king'){
-        return captures
-    } else {
-        if(target.piece.color != square.piece.color){
-            return [...captures, square]
+    if(checks){
+        if(squareIsEmpty(square)){
+            return captures
+        } else {
+            if(target.piece.color != square.piece.color && square.piece.type == 'king'){
+                return [...captures, square]
+            }
+            return captures
         }
-        return captures
+    } else {
+        if(squareIsEmpty(square) || square.piece.type == 'king'){
+            return captures
+        } else {
+            if(target.piece.color != square.piece.color){
+                return [...captures, square]
+            }
+            return captures
+        }
     }
-}
+    }
 
-export const generatePawnCaptures = (target, captures, boardData) => {
+
+export const generatePawnCaptures = (target, captures, boardData, checks=false) => {
     if(target.column+1 <= 8) {
-        captures = addCapture(target.row+1, target.column+1, captures, target, boardData)
+        captures = addCapture(target.row+1, target.column+1, captures, target, boardData, checks)
     }
     if(target.column-1 > 0){
-        captures = addCapture(target.row+1, target.column-1, captures, target, boardData)
+        captures = addCapture(target.row+1, target.column-1, captures, target, boardData, checks)
     }
     return captures
 }
 
-export const generateBlackPawnCaptures = (target, captures, boardData) => {
+export const generateBlackPawnCaptures = (target, captures, boardData, checks=false) => {
     if(target.column+1 <= 8) {
-        captures = addCapture(target.row-1, target.column+1, captures, target, boardData)
+        captures = addCapture(target.row-1, target.column+1, captures, target, boardData, checks)
     }
     if(target.column-1 > 0){
-        captures = addCapture(target.row-1, target.column-1, captures, target, boardData)
+        captures = addCapture(target.row-1, target.column-1, captures, target, boardData, checks)
     }
     return captures
 }
 
-export const generateKnightCaptures = (target, captures, boardData) => {
+export const generateKnightCaptures = (target, captures, boardData, checks=false) => {
     if(target.row+2 <= 8 && target.column + 1 <= 8){
-        captures = addCapture(target.row+2, target.column+1, captures, target, boardData)
+        captures = addCapture(target.row+2, target.column+1, captures, target, boardData, checks)
     }
     if(target.row+2 <= 8 && target.column - 1 > 0){
-        captures = addCapture(target.row+2, target.column-1, captures, target, boardData)
+        captures = addCapture(target.row+2, target.column-1, captures, target, boardData, checks)
     }
     if(target.row-2 >0 && target.column + 1 <= 8){
-        captures = addCapture(target.row-2, target.column+1, captures, target, boardData)
+        captures = addCapture(target.row-2, target.column+1, captures, target, boardData, checks)
     }
     if(target.row-2 >0 && target.column - 1 > 0){
-        captures = addCapture(target.row-2, target.column-1, captures, target, boardData)
+        captures = addCapture(target.row-2, target.column-1, captures, target, boardData, checks)
     }
     if(target.row+1 <= 8 && target.column + 2 <= 8){
-        captures = addCapture(target.row+1, target.column+2, captures, target, boardData)
+        captures = addCapture(target.row+1, target.column+2, captures, target, boardData, checks)
     }
     if(target.row+1 <= 8 && target.column - 2 > 0){
-        captures = addCapture(target.row+1, target.column-2, captures, target, boardData)
+        captures = addCapture(target.row+1, target.column-2, captures, target, boardData, checks)
     }
     if(target.row-1 > 0 && target.column + 2 <= 8){
-        captures = addCapture(target.row-1, target.column+2, captures, target, boardData)
+        captures = addCapture(target.row-1, target.column+2, captures, target, boardData, checks)
     }
     if(target.row-1 > 0 && target.column - 2 > 0){
-        captures = addCapture(target.row-1, target.column-2, captures, target, boardData)
+        captures = addCapture(target.row-1, target.column-2, captures, target, boardData, checks)
     }
     return captures
 }
 
-export const generateRookCaptures = (target, captures, boardData) => {
+export const generateRookCaptures = (target, captures, boardData, checks=false) => {
     let i = 1
     while(target.row+i <=8){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column, boardData))){
-            captures = addCapture(target.row+i, target.column, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column, captures, target, boardData, checks)
             break;
         }
         i++
@@ -220,7 +232,7 @@ export const generateRookCaptures = (target, captures, boardData) => {
     i =-1
     while(target.row+i > 0){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column, boardData))){
-            captures = addCapture(target.row+i, target.column, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column, captures, target, boardData, checks)
             break;
         }
         i--
@@ -229,7 +241,7 @@ export const generateRookCaptures = (target, captures, boardData) => {
     i =1
     while(target.column+i <= 8){
         if(!squareIsEmpty(fetchSquare(target.row,target.column+i, boardData))){
-            captures = addCapture(target.row, target.column+i, captures, target, boardData)
+            captures = addCapture(target.row, target.column+i, captures, target, boardData, checks)
             break;
         }
         i++
@@ -238,7 +250,7 @@ export const generateRookCaptures = (target, captures, boardData) => {
     i =-1
     while(target.column+i > 0){
         if(!squareIsEmpty(fetchSquare(target.row,target.column+i, boardData))){
-            captures = addCapture(target.row, target.column+i, captures, target, boardData)
+            captures = addCapture(target.row, target.column+i, captures, target, boardData, checks)
             break;
         }
         i--
@@ -247,12 +259,12 @@ export const generateRookCaptures = (target, captures, boardData) => {
     return captures
 }
 
-export const generateBishopCaptures = (target, captures, boardData) => {
+export const generateBishopCaptures = (target, captures, boardData, checks=false) => {
     let i = 1;
     let j = 1;
     while(target.row+i <=8 && target.column + j <= 8){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j, boardData))){
-            captures = addCapture(target.row+i, target.column+j, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column+j, captures, target, boardData, checks)
             break;
         }
         i++
@@ -263,7 +275,7 @@ export const generateBishopCaptures = (target, captures, boardData) => {
     j = 1;
     while(target.row+i > 0 && target.column + j <= 8){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j, boardData))){
-            captures = addCapture(target.row+i, target.column+j, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column+j, captures, target, boardData, checks)
             break;
         }
         i--
@@ -274,7 +286,7 @@ export const generateBishopCaptures = (target, captures, boardData) => {
     j = -1;
     while(target.row+i <=8 && target.column + j > 0){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j, boardData))){
-            captures = addCapture(target.row+i, target.column+j, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column+j, captures, target, boardData, checks)
             break;
         }
         i++
@@ -285,7 +297,7 @@ export const generateBishopCaptures = (target, captures, boardData) => {
     j = -1;
     while(target.row+i > 0 && target.column + j > 0){
         if(!squareIsEmpty(fetchSquare(target.row+i,target.column+j, boardData))){
-            captures = addCapture(target.row+i, target.column+j, captures, target, boardData)
+            captures = addCapture(target.row+i, target.column+j, captures, target, boardData, checks)
             break;
         }
         i--
@@ -294,9 +306,9 @@ export const generateBishopCaptures = (target, captures, boardData) => {
     return captures
 }
 
-export const generateQueenCaptures = (target, captures, boardData) => {
-    captures = generateBishopCaptures(target, captures, boardData)
-    captures = generateRookCaptures(target, captures, boardData)
+export const generateQueenCaptures = (target, captures, boardData, checks=false) => {
+    captures = generateBishopCaptures(target, captures, boardData, checks)
+    captures = generateRookCaptures(target, captures, boardData, checks)
     return captures
 }
 
@@ -449,4 +461,46 @@ export const checkForCheck = (boardData, color) => {
     
     }
 
+}
+
+const addEnPassant = (row, column, captures, target, boardData) => {
+    let square = fetchSquare(row, column, boardData)
+    return [...captures, square]
+}
+
+export const generateEnPassantCaptures = (target, boardData) => {
+    let captures = []
+    if(target.row != 5) return captures;
+    if(target.piece.type != 'pawn') return captures;
+
+    if(target.column > 1){
+        let enpass = fetchSquare(target.row, target.column - 1, boardData)
+
+        if(!squareIsEmpty(enpass)){
+            if(enpass.piece.type == 'pawn' && enpass.piece.color == 'black' && enpass.piece.canEnPassant){
+                let captureSquare = fetchSquare(target.row + 1, target.column - 1, boardData)
+                console.log(captureSquare)
+                if(squareIsEmpty(captureSquare)){
+                    captures = addEnPassant(target.row + 1, target.column - 1, captures, target, boardData)
+                }
+            }
+        }
+    }
+
+    if(target.column < 8){
+        let enpass = fetchSquare(target.row, target.column + 1, boardData)
+        if(!squareIsEmpty(enpass)){
+            
+            if(enpass.piece.type == 'pawn' && enpass.piece.color == 'black' && enpass.piece.canEnPassant){
+                let captureSquare = fetchSquare(target.row + 1, target.column + 1, boardData)
+                console.log(captureSquare)
+                if(squareIsEmpty(captureSquare)){
+                    captures = addEnPassant(target.row + 1, target.column + 1, captures, target, boardData)
+                }
+            }
+        }
+    }
+
+    return captures
+    
 }
