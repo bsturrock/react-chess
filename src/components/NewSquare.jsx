@@ -283,7 +283,13 @@ const NewSquare = ({data}) => {
         let direction = endSquare.column == 7 ? 'king' : 'queen'
         const newBoard = buildPotentialBoardAfterCastle(startSquare,endSquare,direction)
         //If won't be in check
+        let {whiteInCheck, allchecks} = checkForCheck(newBoard)
+        
+        if(whiteInCheck){
+            return
+        }
         setBoard(newBoard)
+        setChecks(allchecks)
         clearSquareAndMoves()
         setTurn('black')
     }
