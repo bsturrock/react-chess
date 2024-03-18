@@ -199,6 +199,18 @@
     background-color: rgb(255, 115, 0)
 }
 
+.square.checkmate {
+    background-color: red;
+}
+
+.square.checkmate:hover{
+    color: rgb(224, 31, 31)
+}
+
+.square.check:hover {
+    color: rgb(229, 116, 24)
+}
+
 .square.move::after {
     content: '';
     position: absolute;

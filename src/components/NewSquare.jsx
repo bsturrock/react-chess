@@ -38,6 +38,9 @@ const NewSquare = ({data}) => {
 
     const checks = useStore((store)=>store.checks)
     const setChecks = useStore((store)=>store.setChecks)
+    
+    const checkmates = useStore((store)=>store.checkmates)
+    // const setCheckmates = useStore((store)=>store.setCheckmates)
 
     const clearComputerMoves = useStore((store)=>store.clearComputerMoves)
     const startComputerMove = useStore((store)=>store.startComputerMove)
@@ -50,6 +53,7 @@ const NewSquare = ({data}) => {
     const isCheck = checks.includes(data)
     const isStartComputerMove = startComputerMove == data
     const isEndComputerMove = endComputerMove == data
+    const isCheckmate = checkmates.includes(data)
 
     const colorClass = (data.row+data.column)%2==0?' dark':' light'
     const pieceClass = piece==null ? '' : ' ' + piece.color + ' ' + piece.type
@@ -60,6 +64,7 @@ const NewSquare = ({data}) => {
     const castleClass = isCastle ? ' castle' : ''
     const enPassantClass = isEnPassant ? ' capture' : ''
     const checkClass = isCheck ? ' check' : ''
+    const checkmateClass = isCheckmate ? 'mate' : ''
     const computerMoveClass = isStartComputerMove ? ' prevComp' : isEndComputerMove ? ' newComp' : ''
 
 
@@ -208,6 +213,8 @@ const NewSquare = ({data}) => {
                 whiteCaptures = generateRookCaptures(square, whiteCaptures, newBoard, true)
             } else if (square.piece.type == 'queen'){
                 whiteCaptures = generateQueenCaptures(square, whiteCaptures, newBoard, true)
+            } else if (square.piece.type == 'king'){
+                whiteCaptures = generateKingCaptures(square, whiteCaptures, newBoard, true)
             }
         }
 
@@ -226,6 +233,8 @@ const NewSquare = ({data}) => {
                 blackCaptures = generateRookCaptures(square, blackCaptures, newBoard, true)
             } else if (square.piece.type == 'queen'){
                 blackCaptures = generateQueenCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'king'){
+                blackCaptures = generateKingCaptures(square, blackCaptures, newBoard, true)
             }
         }
 
@@ -315,7 +324,7 @@ const NewSquare = ({data}) => {
     
 
     return (
-        <div onClick={handleClick} className={`square${colorClass}${pieceClass}${hoverableClass}${activeClass}${moveClass}${captureClass}${castleClass}${enPassantClass}${checkClass}${computerMoveClass}`}></div>
+        <div onClick={handleClick} className={`square${colorClass}${pieceClass}${hoverableClass}${activeClass}${moveClass}${captureClass}${castleClass}${enPassantClass}${checkClass}${checkmateClass}${computerMoveClass}`}></div>
     )
 }
 

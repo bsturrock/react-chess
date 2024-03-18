@@ -361,30 +361,30 @@ export const generateKingMoves = (target, moves, boardData) => {
     return moves
 }
 
-export const generateKingCaptures = (target, captures, boardData) => {
+export const generateKingCaptures = (target, captures, boardData, checks = false) => {
     if(target.row+1 <= 8 && target.column+1 <= 8){
-        captures = addCapture(target.row+1, target.column+1, captures, target, boardData)
+        captures = addCapture(target.row+1, target.column+1, captures, target, boardData, checks)
     }
     if(target.row-1 > 0 && target.column+1 <= 8){
-        captures = addCapture(target.row-1,target.column+1,captures, target, boardData)
+        captures = addCapture(target.row-1,target.column+1,captures, target, boardData, checks)
     }
     if(target.row+1 <= 8 && target.column-1 > 0){
-        captures = addCapture(target.row+1,target.column-1,captures, target, boardData)
+        captures = addCapture(target.row+1,target.column-1,captures, target, boardData, checks)
     }
     if(target.row-1 > 0 && target.column-1 > 0){
-        captures = addCapture(target.row-1,target.column-1,captures, target, boardData)
+        captures = addCapture(target.row-1,target.column-1,captures, target, boardData, checks)
     }
     if(target.row+1 <= 8){
-        captures = addCapture(target.row+1,target.column,captures,target, boardData)
+        captures = addCapture(target.row+1,target.column,captures,target, boardData, checks)
     }
     if(target.row-1 > 0 ){
-        captures = addCapture(target.row-1,target.column,captures,target, boardData)
+        captures = addCapture(target.row-1,target.column,captures,target, boardData, checks)
     }
     if(target.column-1 > 0 ){
-        captures = addCapture(target.row,target.column-1,captures,target, boardData)
+        captures = addCapture(target.row,target.column-1,captures,target, boardData, checks)
     }
     if(target.column+1 <= 8){
-        captures = addCapture(target.row,target.column+1,captures,target, boardData)
+        captures = addCapture(target.row,target.column+1,captures,target, boardData, checks)
     }
 
     return captures

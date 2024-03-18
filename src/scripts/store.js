@@ -170,7 +170,11 @@ const useStore = create((set)=>({
     endComputerMove: null,
     setStartComputerMove: (move) => set({startComputerMove: move}),
     setEndComputerMove: (move) => set({endComputerMove: move}),
-    clearComputerMoves: () => set({startComputerMove: null, endComputerMove: null})
+    clearComputerMoves: () => set({startComputerMove: null, endComputerMove: null}),
+
+    checkmates: [],
+    setCheckmates: (checkmates) => set({checkmates: checkmates}),
+    clearCheckmates: () => set({checkmates: null})
 }))
 
 export default useStore

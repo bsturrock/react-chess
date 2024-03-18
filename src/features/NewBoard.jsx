@@ -3,7 +3,7 @@ import useStore from "../scripts/store"
 import './Board.css'
 import { useEffect } from "react"
 import Fen from "../scripts/fen"
-import { generateBishopCaptures, generatePawnCaptures,generateQueenCaptures, generateKnightCaptures, generateRookCaptures, generateBlackPawnCaptures } from '../scripts/newMoves'
+import { generateBishopCaptures, generatePawnCaptures,generateQueenCaptures, generateKnightCaptures, generateRookCaptures, generateBlackPawnCaptures, generateKingMoves, generateKingCaptures, generatePawnMoves, generateBishopMoves, generateKnightMoves, generateQueenMoves, generateRookMoves } from '../scripts/newMoves'
 
 const NewBoard = () => {
 
@@ -15,6 +15,9 @@ const NewBoard = () => {
     const setChecks = useStore((store)=>store.setChecks)
     const setStartComputerMove = useStore((store)=>store.setStartComputerMove)
     const setEndComputerMove = useStore((store)=>store.setEndComputerMove)
+
+    const setCheckmates = useStore((store)=> store.setCheckmates)
+    // const checkmates = useStore((store)=>store.checkmates)
 
     const fen = new Fen()
 
@@ -78,6 +81,8 @@ const NewBoard = () => {
                 whiteCaptures = generateRookCaptures(square, whiteCaptures, newBoard, true)
             } else if (square.piece.type == 'queen'){
                 whiteCaptures = generateQueenCaptures(square, whiteCaptures, newBoard, true)
+            } else if(square.piece.type == 'king'){
+                whiteCaptures = generateKingCaptures(square, whiteCaptures,newBoard, true)
             }
         }
 
@@ -96,6 +101,8 @@ const NewBoard = () => {
                 blackCaptures = generateRookCaptures(square, blackCaptures, newBoard, true)
             } else if (square.piece.type == 'queen'){
                 blackCaptures = generateQueenCaptures(square, blackCaptures, newBoard, true)
+            } else if (square.piece.type == 'king'){
+                blackCaptures = generateKingCaptures(square, blackCaptures, newBoard, true)
             }
         }
 
@@ -105,6 +112,56 @@ const NewBoard = () => {
             allchecks: [...whiteCaptures, ...blackCaptures]
         }
 
+    }
+
+    const checkForCheckmate = (newBoard) => {
+        console.log('starting checkmate check.')
+        let kingMoves = []
+        let whiteKing = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'white' && ele.piece.type == 'king')[0];
+
+        kingMoves = generateKingMoves(whiteKing,kingMoves,newBoard)
+        kingMoves = generateKingCaptures(whiteKing,kingMoves,newBoard)
+
+        for(let move of kingMoves){
+            let testBoard = buildPotentialBoard(whiteKing, move)
+            let {whiteInCheck} = checkForCheck(testBoard)
+            if(!whiteInCheck){
+                return []
+            }
+        }
+        console.log('completed king moves check')
+
+        let whiteCaptures = []
+        let whiteSquares = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'white')
+        for(let square of whiteSquares){
+            if(square.piece == null){continue}
+            if(square.piece.type == 'pawn'){
+                whiteCaptures = generatePawnCaptures(square, whiteCaptures, newBoard, true)
+                whiteCaptures = generatePawnMoves(square,whiteCaptures,newBoard)
+            } else if (square.piece.type == 'bishop'){
+                whiteCaptures = generateBishopCaptures(square, whiteCaptures, newBoard, true)
+                whiteCaptures = generateBishopMoves(square,whiteCaptures,newBoard)
+            } else if (square.piece.type == 'knight'){
+                whiteCaptures = generateKnightCaptures(square, whiteCaptures, newBoard, true)
+                whiteCaptures = generateKnightMoves(square,whiteCaptures,newBoard)
+            } else if (square.piece.type == 'rook'){
+                whiteCaptures = generateRookCaptures(square, whiteCaptures, newBoard, true)
+                whiteCaptures = generateRookMoves(square,whiteCaptures,newBoard)
+            } else if (square.piece.type == 'queen'){
+                whiteCaptures = generateQueenCaptures(square, whiteCaptures, newBoard, true)
+                whiteCaptures = generateQueenMoves(square,whiteCaptures,newBoard)
+            }
+
+            for(let move of whiteCaptures){
+                let testBoard = buildPotentialBoard(square, move)
+                let {whiteInCheck} = checkForCheck(testBoard)
+                if(!whiteInCheck){
+                    return []
+                }
+            }
+            whiteCaptures = []
+        }
+        return [whiteKing]
     }
 
     const buildPotentialBoardAfterCastle = (start, end) => {
@@ -197,10 +254,8 @@ const NewBoard = () => {
 
         if(turn=='black'){
             fen.calculatePosition(board, turn)
-            console.log(fen.position)
             setTimeout(async () => {
                 let move = await fetchComputerMove()
-                console.log(move)
                 makeComputerMove(move)
             },1000)
         }
@@ -208,10 +263,16 @@ const NewBoard = () => {
     }, [turn])
 
     useEffect(()=>{
-        console.log('use effect for check')
         if(turn == 'white'){
             let {allchecks} = checkForCheck(board)
             setChecks(allchecks)
+            console.log(allchecks)
+            if(allchecks.length > 0){
+                let checkmates = checkForCheckmate(board)
+                setCheckmates(checkmates)
+            } else {
+                setCheckmates([])
+            }
         }
     },[board])
 
