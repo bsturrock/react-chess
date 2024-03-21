@@ -1,9 +1,11 @@
 import NewSquare from "../components/NewSquare"
 import useStore from "../scripts/store"
+import { useState } from "react"
 import './Board.css'
 import { useEffect } from "react"
 import Fen from "../scripts/fen"
 import { generateBishopCaptures, generatePawnCaptures,generateQueenCaptures, generateKnightCaptures, generateRookCaptures, generateBlackPawnCaptures, generateKingMoves, generateKingCaptures, generatePawnMoves, generateBishopMoves, generateKnightMoves, generateQueenMoves, generateRookMoves } from '../scripts/newMoves'
+import { buildBoard } from "../scripts/store"
 
 const NewBoard = () => {
 
@@ -19,10 +21,14 @@ const NewBoard = () => {
     const setHasActiveSquare = useStore((store)=>store.setHasActiveSquare)
     const setCheckmates = useStore((store)=> store.setCheckmates)
     const setPossibleMoves = useStore((store)=>store.setPossibleMoves)
-
+    const clearPossibleMoves = useStore((store)=>store.clearPossibleMoves)
+    const setPossibleCaptures = useStore((store)=>store.setPossibleCaptures)
+    const clearPossibleCaptures = useStore((store)=>store.clearPossibleCaptures)
+    const checkmates = useStore((store)=>store.checkmates)
+    const [gameOver, setGameOver] = useState(false)
+    
     const fen = new Fen()
-    console.log(turn)
-
+    
     const parseNotationOfMove = (move) => {
         
         const columnMap = {
@@ -81,9 +87,18 @@ const NewBoard = () => {
         const {start, end} = move  
         const startSquare = board.filter((ele)=>ele.row == start.row && ele.column == start.column)[0]
         const endSquare = board.filter((ele)=>ele.row == end.row && ele.column == end.column)[0]
+        
         setActiveSquare(startSquare)
         setHasActiveSquare(true)
-        setPossibleMoves([endSquare])
+        
+        if(endSquare.piece==null){
+            setPossibleMoves([endSquare])
+            clearPossibleCaptures()
+        } else {
+            setPossibleCaptures([endSquare])
+            clearPossibleMoves()
+        }
+        
     }
 
     const checkForCheck = (newBoard) => {
@@ -302,11 +317,37 @@ const NewBoard = () => {
         }
     },[board])
 
+    useEffect(()=>{
+        if(checkmates.length > 0){
+            setGameOver(true)
+        }
+    },[checkmates])
+
+    const restartGame = () => {
+        setGameOver(false);
+        let newBoard = buildBoard()
+        setBoard(newBoard)
+        setTurn('white')
+        clearPossibleCaptures()
+        clearPossibleMoves()
+
+    }
+
     return <>
         <div className="board">
             {renderedSquares}
         </div>
         <div onClick={getRecommendedMove} className="recommendedMove">Recommend a Move</div>
+{gameOver && <div className="gameOver">
+            <h1>Game Over!</h1>
+            <h2>Play Again?</h2>
+            <div className="buttons">
+                <div onClick={restartGame} className="button">Yes</div>
+                <div className="button">No</div>
+            </div>
+        </div>
+        }
+
     </>
 
 }

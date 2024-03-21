@@ -177,7 +177,7 @@ const NewSquare = ({data}) => {
         clearPossibleCaptures();
         clearPossibleCastles();
         clearPossibleEnPassant();
-        clearComputerMoves();
+
     }
 
     const selectPiece = () => {
@@ -322,6 +322,7 @@ const NewSquare = ({data}) => {
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
+        clearComputerMoves();
         setTurn('black')
     }
 
@@ -343,6 +344,7 @@ const NewSquare = ({data}) => {
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
+        clearComputerMoves();
         setTurn('black')
     }
 
@@ -364,6 +366,7 @@ const NewSquare = ({data}) => {
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
+        clearComputerMoves();
         setTurn('black')
     }
 
@@ -383,6 +386,7 @@ const NewSquare = ({data}) => {
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
+        clearComputerMoves();
         setTurn('black')     
     }
 

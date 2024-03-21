@@ -91,7 +91,7 @@ class King extends Piece {
     }
 }
 
-const buildBoard = () => {
+export const buildBoard = () => {
     const board = []
     for(let i=1; i<9;i++){
         for(let j=8; j>0; j--){
