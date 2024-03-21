@@ -3,12 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage" : "https://bsturrock.github.io/react-chess/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "predeploy" : "vite build",
-    "deploy" : "gh-pages -d build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
