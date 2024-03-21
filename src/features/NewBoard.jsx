@@ -17,7 +17,6 @@ const NewBoard = () => {
     const setEndComputerMove = useStore((store)=>store.setEndComputerMove)
 
     const setCheckmates = useStore((store)=> store.setCheckmates)
-    // const checkmates = useStore((store)=>store.checkmates)
 
     const fen = new Fen()
 
@@ -60,6 +59,10 @@ const NewBoard = () => {
     const fetchComputerMove = async () => {
         let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=1&mode=bestmove')
         let res_json = await res.json()
+
+        if(res_json.data == 'Game over in position.'){
+            return 'black checkmate'
+        }
         let move = parseNotationOfMove(res_json)
         return move
     }
@@ -223,6 +226,13 @@ const NewBoard = () => {
     }
 
     const makeComputerMove = (move) => {
+
+        if(move == 'black checkmate'){
+            let blackKing = board.filter((ele)=>ele.piece!= null && ele.piece.type == 'king' && ele.piece.color == 'black')[0]
+            setCheckmates([blackKing])
+            return
+        }
+
         const {start, end} = move
         let newBoard
         let startSquare = board.filter((ele)=>ele.row == start.row && ele.column == start.column)[0]
@@ -248,8 +258,6 @@ const NewBoard = () => {
 
     }
 
-
-
     useEffect(()=>{
 
         if(turn=='black'){
@@ -266,7 +274,6 @@ const NewBoard = () => {
         if(turn == 'white'){
             let {allchecks} = checkForCheck(board)
             setChecks(allchecks)
-            console.log(allchecks)
             if(allchecks.length > 0){
                 let checkmates = checkForCheckmate(board)
                 setCheckmates(checkmates)

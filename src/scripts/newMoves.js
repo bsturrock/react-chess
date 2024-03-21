@@ -24,6 +24,14 @@ export const generatePawnMoves = (target, moves, boardData) => {
     return moves
 }
 
+export const generateBlackPawnMoves = (target, moves, boardData) => {
+    moves = addMove(target.row-1, target.column, moves, boardData)
+    if(!target.piece.hasMoved){
+        moves = addMove(target.row-2, target.column, moves, boardData)
+    }
+    return moves
+}
+
 export const generateKnightMoves = (target, moves, boardData) => {
     if(target.row+2 <= 8 && target.column + 1 <= 8){
         moves = addMove(target.row+2, target.column+1, moves, boardData)

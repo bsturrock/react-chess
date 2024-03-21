@@ -195,21 +195,7 @@
     background-image: url('static/images/black_king.png');
 }
 
-.square.check{
-    background-color: rgb(255, 115, 0)
-}
 
-.square.checkmate {
-    background-color: red;
-}
-
-.square.checkmate:hover{
-    color: rgb(224, 31, 31)
-}
-
-.square.check:hover {
-    color: rgb(229, 116, 24)
-}
 
 .square.move::after {
     content: '';
@@ -303,4 +289,20 @@
 
 .prevComp {
     background-color: aquamarine !important;
+}
+
+.square.check{
+    background-color: rgb(255, 115, 0)
+}
+
+.square.checkmate {
+    background-color: red;
+}
+
+.square.checkmate:hover{
+    background-color: rgb(222, 67, 67) !important;
+}
+
+.square.check:hover {
+    background-color: rgb(217, 121, 42) !important;
 }

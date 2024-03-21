@@ -1,7 +1,7 @@
 
 import './Square.css'
 import useStore from '../scripts/store'
-import { generateBishopMoves, generatePawnMoves,generateKingMoves, generateKnightMoves, generateRookMoves, generateQueenMoves } from '../scripts/newMoves'
+import { generateBishopMoves, generatePawnMoves,generateKingMoves, generateKnightMoves, generateRookMoves, generateQueenMoves, generateBlackPawnMoves } from '../scripts/newMoves'
 import { generateBishopCaptures, generatePawnCaptures,generateQueenCaptures, generateKnightCaptures, generateRookCaptures, generateKingCaptures } from '../scripts/newMoves'
 import { generateKingCastles } from '../scripts/newMoves'
 import { generateEnPassantCaptures } from '../scripts/newMoves'
@@ -40,7 +40,7 @@ const NewSquare = ({data}) => {
     const setChecks = useStore((store)=>store.setChecks)
     
     const checkmates = useStore((store)=>store.checkmates)
-    // const setCheckmates = useStore((store)=>store.setCheckmates)
+    const setCheckmates = useStore((store)=>store.setCheckmates)
 
     const clearComputerMoves = useStore((store)=>store.clearComputerMoves)
     const startComputerMove = useStore((store)=>store.startComputerMove)
@@ -67,6 +67,55 @@ const NewSquare = ({data}) => {
     const checkmateClass = isCheckmate ? 'mate' : ''
     const computerMoveClass = isStartComputerMove ? ' prevComp' : isEndComputerMove ? ' newComp' : ''
 
+    const checkForCheckmate = (newBoard) => {
+        console.log('starting checkmate check.')
+        let kingMoves = []
+        let blackKing = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'black' && ele.piece.type == 'king')[0];
+
+        kingMoves = generateKingMoves(blackKing,kingMoves,newBoard)
+        kingMoves = generateKingCaptures(blackKing,kingMoves,newBoard)
+        console.log('Black King: ', blackKing)
+        console.log('Total Black King Moves: ', kingMoves)
+        for(let move of kingMoves){
+            let testBoard = buildPotentialBoard(blackKing, move)
+            let {blackInCheck} = checkForCheck(testBoard)
+            if(!blackInCheck){
+                return []
+            }
+        }
+
+        let blackCaptures = []
+        let blackSquares = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'black')
+        for(let square of blackSquares){
+            if(square.piece == null){continue}
+            if(square.piece.type == 'pawn'){
+                blackCaptures = generateBlackPawnCaptures(square, blackCaptures, newBoard, true)
+                blackCaptures = generateBlackPawnMoves(square,blackCaptures,newBoard)
+            } else if (square.piece.type == 'bishop'){
+                blackCaptures = generateBishopCaptures(square, blackCaptures, newBoard, true)
+                blackCaptures = generateBishopMoves(square,blackCaptures,newBoard)
+            } else if (square.piece.type == 'knight'){
+                blackCaptures = generateKnightCaptures(square, blackCaptures, newBoard, true)
+                blackCaptures = generateKnightMoves(square,blackCaptures,newBoard)
+            } else if (square.piece.type == 'rook'){
+                blackCaptures = generateRookCaptures(square, blackCaptures, newBoard, true)
+                blackCaptures = generateRookMoves(square,blackCaptures,newBoard)
+            } else if (square.piece.type == 'queen'){
+                blackCaptures = generateQueenCaptures(square, blackCaptures, newBoard, true)
+                blackCaptures = generateQueenMoves(square,blackCaptures,newBoard)
+            }
+
+            for(let move of blackCaptures){
+                let testBoard = buildPotentialBoard(square, move)
+                let {blackInCheck} = checkForCheck(testBoard)
+                if(!blackInCheck){
+                    return []
+                }
+            }
+            blackCaptures = []
+        }
+        return [blackKing]
+    }
 
     const generatePossibleMoves = (target) => {
         let moves = []
@@ -141,12 +190,20 @@ const NewSquare = ({data}) => {
     }
 
     const buildPotentialBoard = (startSquare, endSquare) => {
+        
         let tempBoard = [...board].filter((ele)=>ele!=startSquare && ele!=endSquare)
         let tempStart = {...startSquare}
         let tempEnd = {...endSquare}
 
+
         tempEnd.piece = tempStart.piece;
         tempStart.piece = null
+
+        if(startSquare.piece.color == 'white'){
+            console.log('FROM: ', tempStart)
+            console.log('TO: ', tempEnd)
+        }
+
 
         if(tempEnd.piece.type == 'pawn' && tempEnd.piece.color == 'black' && tempEnd.row == 5 && tempEnd.piece.hasMoved == false){
             tempEnd.piece.canEnPassant = true
@@ -250,10 +307,15 @@ const NewSquare = ({data}) => {
 
         const newBoard = buildPotentialBoard(startSquare, endSquare)
 
-        let {whiteInCheck, allchecks} = checkForCheck(newBoard)
+        let {whiteInCheck, blackInCheck, allchecks} = checkForCheck(newBoard)
         
         if(whiteInCheck){
             return
+        }
+
+        if(blackInCheck){
+            let checkmates = checkForCheckmate(newBoard)
+            setCheckmates(checkmates)
         }
 
         //If won't be in check
@@ -266,10 +328,15 @@ const NewSquare = ({data}) => {
     const capturePiece = (startSquare, endSquare) => {
         const newBoard = buildPotentialBoard(startSquare, endSquare)
 
-        let {whiteInCheck, allchecks} = checkForCheck(newBoard)
+        let {whiteInCheck, blackInCheck, allchecks} = checkForCheck(newBoard)
         
         if(whiteInCheck){
             return
+        }
+
+        if(blackInCheck){
+            let checkmates = checkForCheckmate(newBoard)
+            setCheckmates(checkmates)
         }
 
         //If won't be in check
@@ -283,11 +350,17 @@ const NewSquare = ({data}) => {
         let direction = endSquare.column == 7 ? 'king' : 'queen'
         const newBoard = buildPotentialBoardAfterCastle(startSquare,endSquare,direction)
         //If won't be in check
-        let {whiteInCheck, allchecks} = checkForCheck(newBoard)
+        let {whiteInCheck, blackInCheck, allchecks} = checkForCheck(newBoard)
         
         if(whiteInCheck){
             return
         }
+
+        if(blackInCheck){
+            let checkmates = checkForCheckmate(newBoard)
+            setCheckmates(checkmates)
+        }
+
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
@@ -296,13 +369,28 @@ const NewSquare = ({data}) => {
 
     const enPassantPiece = (startSquare, endSquare) => {
         const newBoard = buildPotentialBoardAfterEnPassant(startSquare, endSquare)
-        //If won't be in check
+        let {whiteInCheck, blackInCheck, allchecks} = checkForCheck(newBoard)
+        
+        if(whiteInCheck){
+            return
+        }
+
+        if(blackInCheck){
+            let checkmates = checkForCheckmate(newBoard)
+            setCheckmates(checkmates)
+        }
+
         setBoard(newBoard)
+        setChecks(allchecks)
         clearSquareAndMoves()
         setTurn('black')     
     }
 
     const handleClick = () => {
+
+        if(checkmates.length > 0){
+            return
+        }
 
         if(turn=='black'){
             return
