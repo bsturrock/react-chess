@@ -337,7 +337,7 @@ const NewBoard = () => {
         <div className="board">
             {renderedSquares}
         </div>
-        <div onClick={getRecommendedMove} className="recommendedMove">Recommend a Move</div>
+        <div onClick={getRecommendedMove} className="recommendedMove">Recommend Me a Move</div>
 {gameOver && <div className="gameOver">
             <h1>Game Over!</h1>
             <h2>Play Again?</h2>
