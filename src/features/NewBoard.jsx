@@ -15,10 +15,13 @@ const NewBoard = () => {
     const setChecks = useStore((store)=>store.setChecks)
     const setStartComputerMove = useStore((store)=>store.setStartComputerMove)
     const setEndComputerMove = useStore((store)=>store.setEndComputerMove)
-
+    const setActiveSquare = useStore((store)=>store.setActiveSquare)
+    const setHasActiveSquare = useStore((store)=>store.setHasActiveSquare)
     const setCheckmates = useStore((store)=> store.setCheckmates)
+    const setPossibleMoves = useStore((store)=>store.setPossibleMoves)
 
     const fen = new Fen()
+    console.log(turn)
 
     const parseNotationOfMove = (move) => {
         
@@ -65,6 +68,22 @@ const NewBoard = () => {
         }
         let move = parseNotationOfMove(res_json)
         return move
+    }
+
+    const getRecommendedMove = async () => {
+        if(turn!='white'){
+            return
+        }
+        fen.calculatePosition(board,turn)
+        let res = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=4&mode=bestmove')
+        let res_json = await res.json()
+        let move = parseNotationOfMove(res_json)
+        const {start, end} = move  
+        const startSquare = board.filter((ele)=>ele.row == start.row && ele.column == start.column)[0]
+        const endSquare = board.filter((ele)=>ele.row == end.row && ele.column == end.column)[0]
+        setActiveSquare(startSquare)
+        setHasActiveSquare(true)
+        setPossibleMoves([endSquare])
     }
 
     const checkForCheck = (newBoard) => {
@@ -287,6 +306,7 @@ const NewBoard = () => {
         <div className="board">
             {renderedSquares}
         </div>
+        <div onClick={getRecommendedMove} className="recommendedMove">Recommend a Move</div>
     </>
 
 }
