@@ -49,7 +49,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_pawn.png');
+    background-image: url('/static/images/white_pawn.png');
 }
 
 .square.white.knight::after{
@@ -62,7 +62,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_knight.png');
+    background-image: url('/static/images/white_knight.png');
 }
 
 .square.white.bishop::after{
@@ -75,7 +75,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_bishop.png');
+    background-image: url('/static/images/white_bishop.png');
 }
 
 .square.white.rook::after{
@@ -88,7 +88,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_rook.png');
+    background-image: url('/static/images/white_rook.png');
 }
 
 .square.white.queen::after{
@@ -101,7 +101,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_queen.png');
+    background-image: url('/static/images/white_queen.png');
 }
 
 .square.white.king::after{
@@ -114,7 +114,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/white_king.png');
+    background-image: url('/static/images/white_king.png');
 }
 
 .square.black.pawn::after{
@@ -127,7 +127,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_pawn.png');
+    background-image: url('/static/images/black_pawn.png');
 }
 
 .square.black.knight::after{
@@ -140,7 +140,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_knight.png');
+    background-image: url('/static/images/black_knight.png');
 }
 
 .square.black.bishop::after{
@@ -153,7 +153,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_bishop.png');
+    background-image: url('/static/images/black_bishop.png');
 }
 
 .square.black.rook::after{
@@ -166,7 +166,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_rook.png');
+    background-image: url('/static/images/black_rook.png');
 }
 
 .square.black.queen::after{
@@ -179,7 +179,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_queen.png');
+    background-image: url('/static/images/black_queen.png');
 }
 
 .square.black.king::after{
@@ -192,7 +192,7 @@
     height: 100px;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url('static/images/black_king.png');
+    background-image: url('/static/images/black_king.png');
 }
 
 
