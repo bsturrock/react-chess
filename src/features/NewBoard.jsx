@@ -73,7 +73,7 @@ const NewBoard = () => {
         }
         let res2 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=3&mode=bestmove')
         let res_json2 = await res2.json()
-        let res3 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=5&mode=bestmove')
+        let res3 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=15&mode=bestmove')
         let res_json3 = await res3.json()
         let moves = [res_json, res_json2, res_json3]
         let choice = Math.floor(Math.random()*moves.length)
