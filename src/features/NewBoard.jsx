@@ -71,7 +71,7 @@ const NewBoard = () => {
         if(res_json.data == 'Game over in position.'){
             return 'black checkmate'
         }
-        let res2 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=3&mode=bestmove')
+        let res2 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=7&mode=bestmove')
         let res_json2 = await res2.json()
         let res3 = await fetch('https://stockfish.online/api/stockfish.php?fen=' + fen.position + '&depth=13&mode=bestmove')
         let res_json3 = await res3.json()
