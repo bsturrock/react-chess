@@ -1,21 +1,27 @@
+body {
+    background-color: rgb(50,50,50);
+}
+
 .board {
     display: flex;
     flex-wrap: wrap;
     max-width: 804px;
-    border: 2px solid rgb(79, 13, 13);
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
     margin: auto;
     margin-top: 20px;
 }
 
 .recommendedMove {
     display: block;
-    border: 1px solid rgb(100,100,100);
+    border: 1px solid rgb(150,150,150);
+    background-color: rgb(150,150,150);
     width: fit-content;
-    padding: 10px 5px;
+    padding: 10px 15px;
     margin: auto;
     margin-top: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: black;
+    border-radius: 10px;
+    transition: .2s;
 }
 
 .recommendedMove:hover {
@@ -53,7 +59,8 @@
     flex-direction: row;
 }
 
-.gameOver .button {
+.buttons .button {
+
     display: block;
     width: fit-content;
     padding: 10px 20px;

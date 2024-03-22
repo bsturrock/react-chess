@@ -7,10 +7,12 @@
 
 .square.dark {
     background-color: #6c3d19;
+    background-color: rgb(100,100,100);
 }
 
 .square.light {
     background-color: #f4e5cb;
+    background-color: rgb(180,180,180);
 }
 
 .square.selected {
@@ -20,18 +22,19 @@
 .square.active {
     background-color: navy;
 }
+
 .square.active:hover {
     cursor: pointer;
     background-color: rgb(32, 32, 154) !important;
 }
 .square.dark.hoverable:hover {
     cursor: pointer;
-    background-color: rgb(119, 44, 12);
+    background-color: rgb(120, 120, 120);
 }
 
 .square.light.hoverable:hover {
     cursor: pointer;
-    background-color: rgb(228, 215, 186);
+    background-color: rgb(200, 200, 200);
 }
 
 .square.selected:hover {
@@ -292,7 +295,7 @@
 }
 
 .square.check{
-    background-color: rgb(255, 115, 0)
+    background-color: rgb(255, 170, 0)
 }
 
 .square.checkmate {
@@ -304,5 +307,5 @@
 }
 
 .square.check:hover {
-    background-color: rgb(217, 121, 42) !important;
+    background-color: rgb(255, 188, 55) !important;
 }
