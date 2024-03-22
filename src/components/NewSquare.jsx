@@ -133,7 +133,17 @@ const NewSquare = ({data}) => {
         } else if(target.piece.type == 'king'){
             moves = generateKingMoves(target, moves, board)
         }
-        
+
+        moves = moves.map((move)=>{
+            let newBoard = buildPotentialBoard(target, move)
+            let {whiteInCheck} = checkForCheck(newBoard)
+            if(!whiteInCheck){
+                return move
+            } else {
+                return null
+            }
+        })
+
         setPossibleMoves(moves)
     }
 
@@ -153,19 +163,43 @@ const NewSquare = ({data}) => {
         } else if(target.piece.type == 'king'){
             captures = generateKingCaptures(target, captures, board)
         }
+
+        captures = captures.map((move)=>{
+            let newBoard = buildPotentialBoard(target, move)
+            let {whiteInCheck} = checkForCheck(newBoard)
+            if(!whiteInCheck){
+                return move
+            }
+        })
         setPossibleCaptures(captures)
     }
 
     const generatePossibleCastles = (target) => {
 
         if(target.piece==null){clearPossibleCastles(); return}
-        const castles = generateKingCastles(target, board)
+        let castles = generateKingCastles(target, board)
+
+        castles = castles.map((move)=>{
+            let newBoard = buildPotentialBoard(target, move)
+            let {whiteInCheck} = checkForCheck(newBoard)
+            if(!whiteInCheck){
+                return move
+            }
+        })
+
         setPossibleCastles(castles)
     }
 
     const generatePossibleEnPassant = (target) => {
         if(target.piece == null){clearPossibleEnPassant(); return}
-        const captures = generateEnPassantCaptures(target, board)
+        let captures = generateEnPassantCaptures(target, board)
+        captures = captures.map((move)=>{
+            let newBoard = buildPotentialBoard(target, move)
+            let {whiteInCheck} = checkForCheck(newBoard)
+            if(!whiteInCheck){
+                return move
+            }
+        })
         setPossibleEnPassant(captures)
     }
 
@@ -203,8 +237,6 @@ const NewSquare = ({data}) => {
             tempEnd.piece.canEnPassant = true
         }
 
-        tempEnd.piece.hasMoved = true
-
         if(tempEnd.piece.type == 'pawn' && tempEnd.piece.color == 'white' && tempEnd.row == 8){
             tempEnd.piece = tempEnd.piece.promote()
         }
@@ -224,7 +256,6 @@ const NewSquare = ({data}) => {
 
         tempEnd.piece = tempStart.piece;
         tempStart.piece = null
-        tempEnd.piece.hasMoved = true
         rookEnd.piece = rookStart.piece;
         rookStart.piece = null
 
@@ -241,7 +272,6 @@ const NewSquare = ({data}) => {
         tempEnd.piece = tempStart.piece;
         tempStart.piece = null
         pawnLocation.piece = null
-        tempEnd.piece.hasMoved = true
         return [...tempBoard, tempStart, tempEnd, pawnLocation].sort((a,b)=>{
             return b.row - a.row || a.column - b.column
         })
@@ -313,6 +343,10 @@ const NewSquare = ({data}) => {
         }
 
         //If won't be in check
+
+        let movedPiece = newBoard.filter((ele)=>ele.row==endSquare.row && ele.column == endSquare.column)[0]
+        movedPiece.piece.hasMoved = true
+
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
@@ -334,6 +368,8 @@ const NewSquare = ({data}) => {
             setCheckmates(checkmates)
         }
 
+        let movedPiece = newBoard.filter((ele)=>ele.row==endSquare.row && ele.column == endSquare.column)[0]
+        movedPiece.piece.hasMoved = true
         //If won't be in check
         setBoard(newBoard)
         setChecks(allchecks)
@@ -357,6 +393,9 @@ const NewSquare = ({data}) => {
             setCheckmates(checkmates)
         }
 
+        let movedPiece = newBoard.filter((ele)=>ele.row==endSquare.row && ele.column == endSquare.column)[0]
+        movedPiece.piece.hasMoved = true
+
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
@@ -377,6 +416,9 @@ const NewSquare = ({data}) => {
             setCheckmates(checkmates)
         }
 
+        let movedPiece = newBoard.filter((ele)=>ele.row==endSquare.row && ele.column == endSquare.column)[0]
+        movedPiece.piece.hasMoved = true
+        
         setBoard(newBoard)
         setChecks(allchecks)
         clearSquareAndMoves()
