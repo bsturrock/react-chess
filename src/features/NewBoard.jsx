@@ -254,7 +254,7 @@ const NewBoard = () => {
 
         tempEnd.piece.hasMoved = true
 
-        if(tempEnd.piece.type == 'pawn' && tempEnd.piece.color == 'color' && tempEnd.row == 1){
+        if(tempEnd.piece.type == 'pawn' && tempEnd.piece.color == 'black' && tempEnd.row == 1){
             tempEnd.piece = tempEnd.piece.promote()
         }
 
