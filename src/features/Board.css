@@ -60,10 +60,14 @@ body {
 }
 
 .buttons .button {
-
     display: block;
     width: fit-content;
     padding: 10px 20px;
     border: 1px solid rgb(100,100,100);
     margin: 40px 20px;
+}
+
+.buttons .button:hover {
+    cursor: pointer;
+    background-color: rgb(100,100,100);
 }
