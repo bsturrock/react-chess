@@ -77,6 +77,7 @@ const NewBoard = () => {
         let res_json3 = await res3.json()
         let moves = [res_json, res_json2, res_json3]
         let choice = Math.floor(Math.random()*moves.length)
+        console.log(moves)
 
         let move = parseNotationOfMove(moves[choice])
         return move
