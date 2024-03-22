@@ -26,6 +26,8 @@ const NewBoard = () => {
     const clearPossibleCaptures = useStore((store)=>store.clearPossibleCaptures)
     const checkmates = useStore((store)=>store.checkmates)
     const [gameOver, setGameOver] = useState(false)
+    const setMissingPieces = useStore((store)=>store.setMissingPieces)
+    const missingPieces = useStore((store)=>store.missingPieces)
     
     const fen = new Fen()
     
@@ -296,6 +298,39 @@ const NewBoard = () => {
 
     }
 
+    const calculateCapturedPieces = () => {
+        let existingPieces = board.map((ele) => {
+            let piece = ele.piece!=null ? {type: ele.piece.type, color: ele.piece.color} : false
+            if(piece){
+                return piece
+            }
+        })
+        existingPieces = existingPieces.filter((ele)=>ele!=undefined)
+        existingPieces = existingPieces.reduce((acc, curr) => {
+            return {...acc, [curr.color]: {...acc[curr.color], [curr.type]:acc[curr.color][curr.type]+1}}
+        },{white: {pawn: 0, knight: 0, bishop: 0, rook: 0, queen: 0, king: 0}, black:{pawn: 0, knight: 0, bishop: 0, rook: 0, queen: 0, king: 0}})
+
+        const missing = {
+            white: {
+                pawn: 8 - existingPieces.white.pawn,
+                bishop: 2 - existingPieces.white.bishop,
+                knight: 2 - existingPieces.white.knight,
+                rook: 2 - existingPieces.white.rook,
+                queen: 1 - existingPieces.white.queen,
+            },
+            black: {
+                pawn: 8 - existingPieces.black.pawn,
+                bishop: 2 - existingPieces.black.bishop,
+                knight: 2 - existingPieces.black.knight,
+                rook: 2 - existingPieces.black.rook,
+                queen: 1 - existingPieces.black.queen,
+            }
+        }
+
+        return missing
+
+    }
+
     useEffect(()=>{
 
         if(turn=='black'){
@@ -319,6 +354,10 @@ const NewBoard = () => {
                 setCheckmates([])
             }
         }
+        let capturedPieces = calculateCapturedPieces()
+        console.log(capturedPieces)
+        setMissingPieces(capturedPieces)
+
     },[board])
 
     useEffect(()=>{
@@ -334,11 +373,62 @@ const NewBoard = () => {
         setTurn('white')
         clearPossibleCaptures()
         clearPossibleMoves()
+    }
 
+    const renderedBlackCapturedPieces = () => {
+        let pieces = []
+        let x = missingPieces.black.pawn
+        for(let y=0;y < x; y++){
+            pieces.unshift(<div className='miniBlackPawn'></div>)
+        }
+        x = missingPieces.black.knight
+        for(let y=0;y < x; y++){
+            pieces.unshift(<div className='miniBlackKnight'></div>)
+        }
+        x = missingPieces.black.bishop
+        for(let y=0;y < x; y++){
+            pieces.unshift(<div className='miniBlackBishop'></div>)
+        }
+        x = missingPieces.black.queen
+        for(let y=0;y < x; y++){
+            pieces.unshift(<div className='miniBlackQueen'></div>)
+        }
+        x = missingPieces.black.rook
+        for(let y=0;y < x; y++){
+            pieces.unshift(<div className='miniBlackRook'></div>)
+        }
+        return pieces
+    }
+
+    const renderedWhiteCapturedPieces = () => {
+        let pieces = []
+        let x = missingPieces.white.pawn
+        for(let y=0;y < x; y++){
+            pieces.push(<div className='miniWhitePawn'></div>)
+        }
+        x = missingPieces.white.knight
+        for(let y=0;y < x; y++){
+            pieces.push(<div className='miniWhiteKnight'></div>)
+        }
+        x = missingPieces.white.bishop
+        for(let y=0;y < x; y++){
+            pieces.push(<div className='miniWhiteBishop'></div>)
+        }
+        x = missingPieces.white.queen
+        for(let y=0;y < x; y++){
+            pieces.push(<div className='miniWhiteQueen'></div>)
+        }
+        x = missingPieces.white.rook
+        for(let y=0;y < x; y++){
+            pieces.push(<div className='miniWhiteRook'></div>)
+        }
+        return pieces
     }
 
     return <>
         <div className="board">
+            <div className="capturedWhitePieces">{renderedWhiteCapturedPieces()}</div>
+            <div className="capturedBlackPieces">{renderedBlackCapturedPieces()}</div>
             {renderedSquares}
         </div>
         <div onClick={getRecommendedMove} className="recommendedMove">Recommend Me a Move</div>

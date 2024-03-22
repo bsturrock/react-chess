@@ -8,6 +8,7 @@ body {
     max-width: 804px;
     margin: auto;
     margin-top: 20px;
+    position: relative;
 }
 
 .recommendedMove {
@@ -70,4 +71,108 @@ body {
 .buttons .button:hover {
     cursor: pointer;
     background-color: rgb(100,100,100);
+}
+
+.capturedBlackPieces {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    position: absolute;
+    left: 99.5%;
+    top: 0;
+    width: 30px;
+    height: 100%;
+}
+
+.capturedWhitePieces {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: absolute;
+    right: 100%;
+    top: 0;
+    width: 30px;
+    height: 100%;
+}
+
+.miniBlackPawn {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/black_pawn.png');
+}
+
+.miniBlackKnight {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/black_knight.png');
+}
+
+.miniBlackBishop {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/black_bishop.png');
+}
+
+
+.miniBlackRook {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/black_rook.png');
+}
+
+
+.miniBlackQueen {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/black_queen.png');
+}
+
+
+.miniWhitePawn {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/white_pawn.png');
+}
+.miniWhiteBishop {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/white_bishop.png');
+}
+
+.miniWhiteKnight {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/white_knight.png');
+}
+
+.miniWhiteRook {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/white_rook.png');
+}
+
+.miniWhiteQueen {
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url('/static/images/white_queen.png');
 }

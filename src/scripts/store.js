@@ -174,7 +174,10 @@ const useStore = create((set)=>({
 
     checkmates: [],
     setCheckmates: (checkmates) => set({checkmates: checkmates}),
-    clearCheckmates: () => set({checkmates: null})
+    clearCheckmates: () => set({checkmates: null}),
+
+    missingPieces: {black: {pawn: 0, knight: 0, bishop: 0, rook: 0, queen:0}, white: {pawn: 0, knight: 0, bishop: 0, rook: 0, queen:0}},
+    setMissingPieces: (missingPieces) => set({missingPieces: missingPieces})
 }))
 
 export default useStore
