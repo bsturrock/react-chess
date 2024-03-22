@@ -152,7 +152,6 @@ const NewBoard = () => {
     }
 
     const checkForCheckmate = (newBoard) => {
-        console.log('starting checkmate check.')
         let kingMoves = []
         let whiteKing = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'white' && ele.piece.type == 'king')[0];
 
@@ -166,7 +165,6 @@ const NewBoard = () => {
                 return []
             }
         }
-        console.log('completed king moves check')
 
         let whiteCaptures = []
         let whiteSquares = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'white')

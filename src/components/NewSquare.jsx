@@ -68,14 +68,13 @@ const NewSquare = ({data}) => {
     const computerMoveClass = isStartComputerMove ? ' prevComp' : isEndComputerMove ? ' newComp' : ''
 
     const checkForCheckmate = (newBoard) => {
-        console.log('starting checkmate check.')
+
         let kingMoves = []
         let blackKing = newBoard.filter((ele)=>ele.piece!=null && ele.piece.color == 'black' && ele.piece.type == 'king')[0];
 
         kingMoves = generateKingMoves(blackKing,kingMoves,newBoard)
         kingMoves = generateKingCaptures(blackKing,kingMoves,newBoard)
-        console.log('Black King: ', blackKing)
-        console.log('Total Black King Moves: ', kingMoves)
+
         for(let move of kingMoves){
             let testBoard = buildPotentialBoard(blackKing, move)
             let {blackInCheck} = checkForCheck(testBoard)
@@ -198,11 +197,6 @@ const NewSquare = ({data}) => {
 
         tempEnd.piece = tempStart.piece;
         tempStart.piece = null
-
-        if(startSquare.piece.color == 'white'){
-            console.log('FROM: ', tempStart)
-            console.log('TO: ', tempEnd)
-        }
 
 
         if(tempEnd.piece.type == 'pawn' && tempEnd.piece.color == 'black' && tempEnd.row == 5 && tempEnd.piece.hasMoved == false){
